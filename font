@@ -1,0 +1,38 @@
+ ¿àáéíóöüú¡Ó¿...
+................
+ !"#×%÷'()⋅+,-./
+0123456789:;<=>?
+@ABCDEFGHIJKLMNO
+PQRSTUVWXYZ[▫]^_
+-abcdefghijklmno
+pqrstuvwxyz{|}~ 
+𝐢𝐞×⏨∞°ʳᵍ∠ẍȳẋŷ→↲⇒
+ₓ⏨∴⌟≤≠≥◢√∫ᴀʙᴄₙ▶◀
+⁰¹²³⁴⁵⁶⁷⁸⁹⁻ˣº₍₎±
+₀₁₂₋ꜰɴᴘµ𝐀𝐁𝐂𝐃𝐄𝐅𝐏▷
+Σαγεθλμπσϕℓℏ█⎕₃▂
+................
+................
+................
+======
+
+Approximation of the calculator's font using Unicode. Used by `compiler.py`.
+
+Incorrect approximations:
+
+0x0C	¿		small superscript inverted ?
+0x5C	▫		superscript square (sqrdeg)
+0x82	×		lower multiplication symbol
+0x8A	ẍ	x̅	x with overline
+0x8B	ȳ	y̅	y with overline
+0x8C	ẋ	x̂	x with circumflex
+0x92	∴	⏨̄	lower "10" with "-" on top
+0xAA	¯	⁻¹	superscript "-1"
+0xAC	º	¹⁰	superscript "10"
+
+======
+
+File format
+
+First 16 lines: Each line should contain at most 16 characters.
+Rest: comments.
