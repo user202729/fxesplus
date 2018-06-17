@@ -266,7 +266,8 @@ def parse_data(data, print = print, parse_0x08 = False):
 				byte_2 = block.read1()
 				is_struct = byte_2&1; byte_2 ^= is_struct
 
-				block.skip_zero(2)
+				is_bitfield = block.read1() # 0x07: bitfield, 0x00: not
+				block.skip_zero(1)
 
 				is_function = block.read1()
 
@@ -288,7 +289,7 @@ def parse_data(data, print = print, parse_0x08 = False):
 				assert (byte_9>>1)&1 == (_type2 != 0)
 				byte_9 &= ~2
 
-				# Don't read this `if` statement
+				# Don't read this
 				if is_function == 1:
 					assert not is_struct
 					assert _type2 == 0
@@ -310,6 +311,13 @@ def parse_data(data, print = print, parse_0x08 = False):
 						typestr = f'{typestr}'
 					else: assert False
 				else: assert False
+
+				if is_bitfield == 0x00:
+					pass
+				elif is_bitfield == 0x07:
+					typestr += ' bitfield'
+				else:
+					assert False
 
 				name_dict = {
 					1: nameof_export, 2: nameof_dcl, 3: nameof_defvar
@@ -367,7 +375,7 @@ def main():
 			'Please provide 1 argument, path to an .obj file')
 
 	with open(sys.argv[1], 'rb') as obj_file:
-		parse_data(obj_file.read())
+		parse_data(obj_file.read(), parse_0x08=True)
 
 if __name__ == '__main__':
 	main()

@@ -1,0 +1,18 @@
+# Output of `parse_all_obj.py`.
+# Replaced '(^Fn.*\n)*Fn' by 'Fn'.
+# Replaced '^Fn.*\n(^ROM.*\n){2,}' by ''
+
+Fn _strcpy_nn, len 30
+ROM address 4e50
+Fn _strcat_nn, len 40
+ROM address 96ea
+Fn _memcpy_nn, len 58
+ROM address 7ef6
+Fn _memmove_nn, len 108
+ROM address 4ce8
+Fn _strlen_n, len 30
+ROM address 8b82
+Fn _memset_n, len 56
+ROM address 7e94
+Fn _strchr_n, len 36
+ROM address 8ba0
