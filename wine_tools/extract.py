@@ -17,6 +17,7 @@ with open(f'{lib_name}.lst', 'r') as lst_file:
 
 # =========== end reading input
 
+import sys
 sys.path.append('..')
 from xxd import xxd
 
