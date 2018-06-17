@@ -1,0 +1,95 @@
+# This find the location `main.obj` is created and store its handle
+# to $obj_handle
+wine cmd
+init
+winedbg --gdb rasu8 main
+# print code
+define pc
+	x/20i $pc-20
+end
+# print stack
+define ps
+	x/32xw $esp
+end
+shell stty echo
+#
+b *CreateFileA+0 if (int)strcmp(*(char**)($esp+4), "main.obj") == 0
+c
+#
+# now hit breakpoint.
+fin
+set $obj_handle = $eax
+#
+del 1
+
+===========
+
+b *WriteFile+0
+b *0x41af32
+b *0x41af38
+b *0x41b087
+b *0x41b08c
+comm 2, 3, 4, 5, 6
+	c
+end
+
+===========
+
+# Break on WriteFile if handle is correct
+# (no need to use this anymore, already figured out the calling fns)
+
+b *WriteFile+0 if $obj_handle == *(int*)($esp+4)
+commands
+	bt
+	c
+end
+c
+
+=============
+
+41a250 calls CreateFileA
+
+41b087 calls 41a8ba runs to...
+41af32 calls WriteFile
+
+
+41a8ba calling convention: 3 argument, (1) is count, (2) is ptr buffer, (3) is something.
+
+============
+
+set $break_41af32 = 1
+#
+b *0x41b087
+commands
+	silent
+	set $first = *(int*)(4+$esp)
+	set $last = $first + *(int*)(8+$esp)
+	#
+	if !$break_41af32
+		echo 41b807 break twice consecutively\n
+	end
+	set $break_41af32 = 0
+	#
+	c
+end
+#
+b *0x41af32
+commands
+	silent
+	set $break_41af32 = 1
+	#
+	if $obj_handle == *(int*)$esp
+		while $first != $last
+			printf "%02x ", *(unsigned char*)$first
+			set $first = $first + 1
+		end
+		echo \n==========\n
+	end
+	#
+	c
+end
+#
+c
+
+====
+

@@ -9,3 +9,5 @@ disas/obj
 wine_tools/LU8100LW.*
 wine_tools/main.*
 wine_tools/obj
+
+**/__pycache__
