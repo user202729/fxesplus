@@ -1,3 +1,5 @@
+// NOTE. This will be made deprecated, use `lib_570esp.py` instead.
+
 /*
 
 ____This_should_be_viewed_at_tabsize_at_least_8____
