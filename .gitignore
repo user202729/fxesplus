@@ -6,7 +6,8 @@ fx_570es+_disas.txt
 disas/bin
 disas/obj
 
-wine_tools/LU8100LW.*
+wine_tools/*.lib
+wine_tools/*.lst
 wine_tools/main.*
 wine_tools/obj
 
