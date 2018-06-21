@@ -1,26 +1,5 @@
 // run parse_obj.py with this file to check its correctness.
 
-struct S {char a; char b; char c;};
-union  U {char a; char b; char c;};
-
-char i;
-extern char ei;
-struct S s;
-extern struct S es;
-union  U u;
-extern union  U eu;
-extern char __far efi;
-extern char const __far efci;
-
-char     ri() {return i ;}
-char     rei(){return ei;}
-struct S rs() {return s ;}
-struct S res(){return es;}
-union  U ru() {return u ;}
-union  U reu(){return eu;}
-char refi(){return efi;}
-char refci(){return efci;}
-
 char a(){return 1;};
 char da();
 
@@ -56,3 +35,28 @@ char longfn(char x){
 	x*=x+x+x+x+x+x+x+x+x+x+x+x+x+x+x+x+x+x+x+x+x+x+x+x+x+x+x+x+x+x+x;
 	return x;
 }
+
+struct S {char a; char b; char c;};
+union  U {char a; char b; char c;};
+
+char i;
+extern char ei;
+struct S s;
+extern struct S es;
+union  U u;
+extern union  U eu;
+char __far fi;
+char const __far fci;
+extern char __far efi;
+extern char const __far efci;
+
+char     ri() {return i ;}
+char     rei(){return ei;}
+struct S rs() {return s ;}
+struct S res(){return es;}
+union  U ru() {return u ;}
+union  U reu(){return eu;}
+char rfi(){return fi;}
+char rfci(){return fci;}
+char refi(){return efi;}
+char refci(){return efci;}

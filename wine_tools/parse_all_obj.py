@@ -17,20 +17,19 @@ for file in os.listdir(os.fsencode(FOLDER_PATH)):
 	with open(FOLDER_PATH + filename, 'rb') as obj_file:
 		data = parse_data(obj_file.read(), print = lambda x:0)
 	for obj_id, obj_name in data['nameof_export'].items():
-		if data['typeof_export'][obj_id] != 'fn':
+		if 'fn' not in data['typeof_export'][obj_id]:
 			continue
 		fn_code = data["obj_data"][obj_id]
 		fn_len = len(fn_code)
 
-		print(f'Fn {obj_name}, len {fn_len}')
-
+		matches = []
 		for i in range(0, len(rom)-fn_len, 2):
 			'''
-			try matching 'rom[i:i+fn_len]' with fn_code.
-			the algorithm used here is not 100% accurate (it should
+			Try matching 'rom[i:i+fn_len]' with fn_code.
+			The algorithm used here is not 100% accurate (it should
 			only match if the 00-00 comes after a L/ST/SB/TB/RB/
 			LEA/B/BL) (see 'out.asm' for more details)
-			but hopefully it's accurate enough
+			but hopefully it's accurate enough.
 
 			This is not the most efficient possible algorithm but
 			it runs fast enough (48.5s on my machine).
@@ -47,5 +46,11 @@ for file in os.listdir(os.fsencode(FOLDER_PATH)):
 					)
 				): break
 			else: # cannot found any mismatch
-				print(f'ROM address {hex(i)[2:]}')
+				if matches:
+					# multiple matches = bad
+					matches = []
+					break
+				matches.append(i)
 
+		if matches:
+			print(f'Fn {obj_name}, adr {hex(matches[0])[2:]}')

@@ -22,9 +22,9 @@ def to_str(data):
 	Convert from return type of `read_str` to a `str`. '''
 	return data[1:].decode('latin-1')
 
-class BytesIO_ (io.BytesIO): 
+class BytesIO_ (io.BytesIO):
 	def readable(self):
-		''' Actually this checks for not EOF. 
+		''' Actually this checks for not EOF.
 		Abuse of derived class ...? '''
 		return len(self.getbuffer()) != self.tell()
 
@@ -51,11 +51,41 @@ class BytesIO_ (io.BytesIO):
 	def skip_zero(self, size):
 		assert self.read(size) == b'\x00'*size, xxd(self.getbuffer())
 
+	def xxd(self):
+		xxd(self.getbuffer())
+
+def access_spec(_access):
+	'''
+	Get object access specification as a string ('near' or 'far')
+	0x00: far, 0x02: near.
+	'''
+	if   _access == 0x00:
+		return 'far'
+	elif _access == 0x02:
+		return 'near'
+	else: assert False
+
+def get_type(_type):
+	'''
+	Get object type as a string.
+	* 0x00: 'fn'    (function)
+	* 0x01: 'var'   (variable)
+	* 0x05: 'const' (constant)
+	'''
+	if   _type == 0x05:
+		return 'const'
+	elif _type == 0x00:
+		return 'fn'
+	elif _type == 0x01:
+		return 'var'
+	else:
+		assert False, _type
+
 # allow user to override `print` function
 def parse_data(data, print = print, parse_0x08 = False):
 	data = BytesIO_(data)
 	nameof_export = {} # the '_' names (public), not '$$' names.
-	typeof_export = {} # the '_' names (public), not '$$' names.
+	typeof_export = {}
 	nameof_defvar = {}
 	nameof_dcl    = {}
 	obj_data      = {} # function code + constant values
@@ -80,9 +110,19 @@ def parse_data(data, print = print, parse_0x08 = False):
 			print(f'Name: {to_str(asm_name)}')
 			assert block.read(2) == b'\x04\x01'
 			print(f'Model: {to_str(block.read_str())}')
-			assert block.read(1) == b'\x01', xxd(block.getbuffer())
+			assert block.read1() == 0x01, block.xxd()
 			block.read(1)
-			assert block.read(4) == b'\x01\x04\x03\x01', xxd(block.getbuffer())
+			assert block.read1() == 0x01, block.xxd()
+
+			mem_model = block.read1()
+			if   mem_model == 0x01:
+				mem_model_str = 'SMALL'
+			elif mem_model == 0x04:
+				mem_model_str = 'LARGE'
+			else: assert False, block.xxd()
+			print(f'Memory model: {mem_model_str}')
+
+			assert block.read(2) == b'\x03\x01', block.xxd()
 			block.skip_zero(1)
 			block.read(3)
 			block.skip_zero(2)
@@ -94,57 +134,34 @@ def parse_data(data, print = print, parse_0x08 = False):
 
 		elif block_type == 0x20:
 			assert asm_name == block.read_str()
-			assert block.read(1) == b'\x02'
+			assert block.read(1) == b'\x02', block.xxd()
 			block.skip_zero(4)
 
-		elif block_type == 0xe: 
+		elif block_type == 0xe:
 			# fn id, size and name
 			# (name is prefixed with '$$' for some reason)
-			print('Functions/constants/var#')
-
-			'''
-			Some information about 'var#'.
-			I have not completely decoded it, but it's related to 
-			static or pre-initialized variables.
-			$$NVARmain | $$NINITVAR | $$NINITTAB
-
-			Most things about it is not known.
-			'''
+			print('Objects with constant storage')
 
 			# everything with storage in .OBJ
 			while block.readable():
 				block.skip_zero(1)
-				obj_id = block.read_int()
-				byte_3 = block.read1()
+				_id = block.read_int()
+				_type = block.read1()
 
-				# TODO xgetmem_f. XFCOD is breaking everything
-				block.read1() 
+				# TODO what is this used for?
+				block.read1()
+
 				block.skip_zero(0x07)
-				byte_c = block.read1()
+				_access = block.read1()
 				block.skip_zero(0x05)
-
-				if byte_3 == 0x05:
-					if   byte_c == 0x02:
-						obj_type = 'const'
-					elif byte_c == 0x00:
-						obj_type = 'var#'
-					else: assert False
-				elif byte_3 == 0x00:
-					obj_type = 'fn'
-					assert byte_c == 0x00
-				elif byte_3 == 0x01:
-					obj_type = 'var#'
-					assert byte_c in (0x00, 0x02), byte_c
-				else:
-					assert False, byte_3
 
 				obj_size = block.read_int()
 				assert block.read(0x05) == b'\x00\x00\x01\x00\x00'
-				obj_name = block.read_str()
+				_name = block.read_str()
 
-				obj_data[obj_id] = bytearray(b'\x00') * obj_size
-				print(f'  {obj_type} {to_str(obj_name)}, #{obj_id}, '+
-					f'size {obj_size}')
+				obj_data[_id] = bytearray(b'\x00') * obj_size
+				print(f'  {get_type(_type)} {access_spec(_access)}'+
+					f'  {to_str(_name)}, #{_id}, {obj_size}B')
 
 		elif block_type == 0x17:
 			print('Global variables')
@@ -153,75 +170,54 @@ def parse_data(data, print = print, parse_0x08 = False):
 				var_id = block.read_int()
 				assert block.read(1) == b'\x01'
 				block.skip_zero(2)
-				assert block.read(1) == b'\x02'
+				_access = block.read1()
 				block.skip_zero(5)
 				var_adr = block.read_int()
 				block.skip_zero(2)
-				nameof_defvar[var_id] = to_str(block.read_str())
+				_name = to_str(block.read_str())
 
-				print(f'  {nameof_defvar[var_id]}, #{var_id}, '+
-					f'@{var_adr}')
+				assert var_id not in nameof_defvar
+				nameof_defvar[var_id] = _name
 
-		elif block_type == 0x16: 
+				print(f'  {access_spec(_access)} '+
+					f'{_name}, #{var_id} @{var_adr}')
+
+		elif block_type == 0x16:
 			# info about symbol name <-> id
 			# (symbol name) = '_' + (function name)
 			while block.readable():
 				block.skip_zero(1)
-				obj_id = block.read_int()
-				byte_3 = block.read1()
+				_id = block.read_int()
+				_type = block.read1()
 				block.skip_zero(0x03)
-				byte_7 = block.read1()
+
+				_access = block.read1()
 
 				block.skip_zero(0x01)
 				block.read1() # TODO 0x2e if _vsprintf_nn, else 0
 				block.read1() # TODO 0x01 if __Ctype, else 0
 				block.skip_zero(0x02)
-				obj_name = block.read_str()
+				_name = block.read_str()
 
-				if   byte_3 == 0x05:
-					assert byte_7 in (0x02, 0x00), byte_7 # TODO
-					obj_type = 'const'
-				elif byte_3 == 0x00:
-					assert byte_7 == 0x00, (byte_3, byte_7)
-					obj_type = 'fn'
-				elif byte_3 == 0x01:
-					assert byte_7 == 0x02, (byte_3, byte_7)
-					obj_type = 'var#'
-				else:
-					assert False, byte_3
-
-				nameof_export[obj_id] = to_str(obj_name)
-				typeof_export[obj_id] = obj_type
-				print(f'{obj_type} {to_str(obj_name)}, #{obj_id}')
+				nameof_export[_id] = to_str(_name)
+				typeof_export[_id] = \
+					f'{get_type(_type)} {access_spec(_access)}'
+				print(typeof_export[_id] +
+					f' {to_str(_name)}, #{_id}')
 
 		elif block_type == 0x18:
 			print('Dcl fn/extern var:')
 			while block.readable():
 				block.skip_zero(1)
-				obj_id = block.read_int()
-				obj_type = block.read1()
-				obj_access = block.read1() # 00: far, 02: near
+				_id = block.read_int()
+				_type = block.read1()
+				_access = block.read1()
 				block.skip_zero(1)
-				obj_name = block.read_str()
+				_name = block.read_str()
 
-				if   obj_type == 0x00:
-					obj_typestr = 'fn'
-				elif obj_type == 0x01:
-					obj_typestr = 'var'
-				elif obj_type == 0x05:
-					obj_typestr = 'var const'
-				else:
-					assert False, (xxd(block.getbuffer()), obj_type)
-
-				obj_typestr += ' '
-				if   obj_access == 0x00:
-					obj_typestr += 'far'
-				elif obj_access == 0x02:
-					obj_typestr += 'near'
-				else: assert False
-
-				nameof_dcl[obj_id] = to_str(obj_name)
-				print(f'  {obj_typestr} {to_str(obj_name)}, #{obj_id}')
+				nameof_dcl[_id] = to_str(_name)
+				print(f'  {get_type(_type)} {access_spec(_access)}'+
+					f' {to_str(_name)}, #{_id}')
 
 
 		elif block_type == 0x06:
@@ -241,8 +237,7 @@ def parse_data(data, print = print, parse_0x08 = False):
 			obj_data[obj_id] \
 				[start_address:start_address+len(read_data)] \
 				= read_data
-			# however not all parts must be initialized :/
-			# especially only for XFTAB or "var#" thing.
+			# however not all parts must be initialized ...
 
 			last_block6_id = obj_id
 			print(f'Block 6 for #{obj_id}, start {start_address}, len {len(read_data)}')
@@ -257,76 +252,69 @@ def parse_data(data, print = print, parse_0x08 = False):
 			# currently this can't parse all types correctly.
 			if not parse_0x08: continue
 
-			print('External addresses for fn ' + 
+			print('External addresses for fn ' +
 				nameof_export[last_block6_id])
-			xxd(block.getbuffer())
 
 			while block.readable():
 				call_adr = block.read_int() # offset 0
-				byte_2 = block.read1()
-				is_struct = byte_2&1; byte_2 ^= is_struct
+				is_struct = block.read1()
 
-				is_bitfield = block.read1() # 0x07: bitfield, 0x00: not
+				# 0x07: bitfield, 0x00: not
+				is_bitfield = block.read1()
 				block.skip_zero(1)
 
-				is_function = block.read1()
+				'''
+				0x01: far fn call
+				0x0c: dsr get for var
+				0x00: address get for var (for both NEAR and FAR)
+				'''
+				cmd_type = block.read1()
 
 				# 1: deffn, 2: dclfn/extern, 3: var
-				_type = block.read1() # offset 6
+				_type2 = block.read1() # offset 6
 
 				_id = block.read_int() # offset 7
 
-				byte_9 = block.read1()
+				_access = block.read1()
+
 				block.skip_zero(1)
 				offset = block.read_int() # offset 0b
 				block.skip_zero(2)
 
-				# 0 for fn, 1 for var/extern var, 5 for extern var const
-				# (for var const it's just hardcoded)
-				byte_0f = block.read1() # offset 0f
-				_type2 = byte_0f&0b101; byte_0f ^= _type2
-
-				assert (byte_9>>1)&1 == (_type2 != 0)
-				byte_9 &= ~2
-
-				# Don't read this
-				if is_function == 1:
-					assert not is_struct
-					assert _type2 == 0
-					if _type == 1:
-						typestr = 'deffn'
-					elif _type == 2:
-						typestr = 'dclfn'
-					else: assert False
-				elif is_function == 0 or is_function == 0x0d:
-					typestr = 'struct' if is_struct else 'var'
-					if _type == 2:
-						if _type2 == 1:
-							typestr = f'extern {typestr}'
-						elif _type2 == 5:
-							typestr = f'extern {typestr} const'
-						else: assert False
-					elif _type == 3:
-						assert _type2 == 1
-						typestr = f'{typestr}'
-					else: assert False
-				else: assert False
-
-				if is_bitfield == 0x00:
-					pass
-				elif is_bitfield == 0x07:
-					typestr += ' bitfield'
-				else:
-					assert False
+				_type = block.read1() # offset 0f
 
 				name_dict = {
 					1: nameof_export, 2: nameof_dcl, 3: nameof_defvar
-				}[_type]
-				print(f'  call@ {call_adr}, {typestr}, ' +
-					f'name {name_dict[_id]}, offset {offset}')
-				if byte_2 or byte_9 or byte_0f:
-					print('Warning: Partially unrecognized 0x08 subblock')
-					xxd(block.getbuffer()[:block.tell()][-16:])
+				}[_type2]
+
+				typestr = get_type(_type)
+				typestr += ' ' + access_spec(_access)
+
+				if   is_bitfield == 0x07:
+					typestr += ' bitfield'
+				elif is_bitfield == 0x00:
+					pass
+				else: assert False, is_bitfield
+
+				if   is_struct == 0x01:
+					typestr += ' struct'
+				elif is_struct == 0x00:
+					pass
+				else: assert False, is_struct
+
+				if   cmd_type == 0x01:
+					assert get_type(_type) == 'fn', get_type(_type)
+				elif cmd_type == 0x0c:
+					typestr += ' (dsr)'
+					assert get_type(_type) in ('var', 'const')
+				elif cmd_type == 0x00:
+					typestr += ' (adr)'
+					assert get_type(_type) in ('var', 'const')
+				else: assert False, cmd_type
+
+
+				print(f'  {typestr}  ' +
+					f'{name_dict[_id]}, call@{call_adr} Δ={offset}')
 
 		elif block_type == 0x13:
 			print('Source file name(s):')
@@ -352,14 +340,14 @@ def parse_data(data, print = print, parse_0x08 = False):
 
 		else:
 			print(f'Unknown block, type {hex(block_type)}')
-			xxd(block.getbuffer())
+			block.xxd()
 			block.read()
 			print('')
 
-		assert not block.readable(), xxd(block.getbuffer())
+		assert not block.readable(), block.xxd()
 
 	# at the end of the 'parse_data' function
-	print('') 
+	print('')
 
 	return {
 		'nameof_export' : nameof_export,
