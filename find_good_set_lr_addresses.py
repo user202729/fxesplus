@@ -1,3 +1,6 @@
+# Find addresses to call to set LR to a "POP PC" command with
+# minimal effect on the calculator.
+
 st='''
 002764   01 F0 50 4E        BL      00h:04E50h
 002768   8E F2              POP     PC

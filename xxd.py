@@ -1,3 +1,6 @@
+# xxd (default configuration) implemented in Python.
+# Used as a library to import.
+
 def xxd(data):
 	hex_data = [hex(byte)[2:].zfill(2) for byte in data]
 	ascii_data = [
