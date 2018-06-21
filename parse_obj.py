@@ -98,9 +98,12 @@ def parse_data(data, print = print, parse_0x08 = False):
 		block_size = data.read_int()
 		block = data.read(block_size)
 
-		# print(f'Block: type {hex(block_type)}, size '
-		# 	+f'{hex(block_size)}, sum {hex(sum(block))}')
+		# print(f'Block: type {hex(block_type)}, size {block_size}')
 
+		assert (sum(block) + block_type +
+			(block_size & 0xFF) + (block_size >> 8)) & 0xFF == 0
+
+		# this byte is only included for calculating checksum
 		block_checksum = block[-1]
 		block = BytesIO_(block[:-1])
 
