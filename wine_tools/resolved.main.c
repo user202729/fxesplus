@@ -60,3 +60,5 @@ char rfi(){return fi;}
 char rfci(){return fci;}
 char refi(){return efi;}
 char refci(){return efci;}
+
+void main(){}

@@ -49,7 +49,9 @@ class BytesIO_ (io.BytesIO):
 		return to_int(self.read(size))
 
 	def skip_zero(self, size):
-		assert self.read(size) == b'\x00'*size, xxd(self.getbuffer())
+		zero_data = self.read(size)
+		assert zero_data == b'\x00'*size, (
+			xxd(zero_data), print('===='), xxd(self.getbuffer()))
 
 	def xxd(self):
 		xxd(self.getbuffer())
@@ -154,17 +156,39 @@ def parse_data(data, print = print, parse_0x08 = False):
 				# TODO what is this used for?
 				block.read1()
 
-				block.skip_zero(0x07)
+				misc_1 = block.read(0x04) # block[0x05:0x09]
+				block.skip_zero(0x03)
 				_access = block.read1()
-				block.skip_zero(0x05)
+				misc_2 = block.read(0x02)
+				block.skip_zero(0x03)
 
 				obj_size = block.read_int()
-				assert block.read(0x05) == b'\x00\x00\x01\x00\x00'
-				_name = block.read_str()
+				block.skip_zero(2)
+				misc_3 = block.read1() # offset 0x16
+				block.skip_zero(2)
+
+				_name = to_str(block.read_str())
+
+				if _name == '': # no name??? related to `main`
+					assert misc_1 == b'\x00\x02\x00\x02'
+					assert misc_2 == b'\x00\x02'
+					assert misc_3 == 0x00
+				elif _name == '$STACK':
+					# Preallocated memory for stack. Its size
+					# == allocated stack size.
+					assert misc_1 == b'\x04\x00\x00\x00', (\
+						_name, misc_1, block.xxd())
+					assert misc_2 == b'\x00\x00'
+					assert misc_3 == 0x01
+				else:
+					assert misc_1 == b'\x00\x00\x00\x00', (\
+						_name, misc_1, block.xxd())
+					assert misc_2 == b'\x00\x00'
+					assert misc_3 == 0x01
 
 				obj_data[_id] = bytearray(b'\x00') * obj_size
 				print(f'  {get_type(_type)} {access_spec(_access)}'+
-					f'  {to_str(_name)}, #{_id}, {obj_size}B')
+					f'  {_name}, #{_id}, {obj_size}B')
 
 		elif block_type == 0x17:
 			print('Global variables')
@@ -233,7 +257,8 @@ def parse_data(data, print = print, parse_0x08 = False):
 			assert obj_type in (
 				0x00,  # function code
 				0x85,  # const
-			)
+				0x80,  # weird thing related to `main`
+			), (obj_type, block.xxd())
 			read_data = block.read()
 
 			# AFAIK, Rasu8 order the blocks correctly
@@ -244,6 +269,8 @@ def parse_data(data, print = print, parse_0x08 = False):
 
 			last_block6_id = obj_id
 			print(f'Block 6 for #{obj_id}, start {start_address}, len {len(read_data)}')
+			# TODO fun thing about the object named '' is that
+			# this returns out of range
 
 		elif block_type == 0x08:
 			'''
@@ -256,7 +283,8 @@ def parse_data(data, print = print, parse_0x08 = False):
 			if not parse_0x08: continue
 
 			print('External addresses for fn ' +
-				nameof_export[last_block6_id])
+				nameof_export.get(last_block6_id, '<unnamed>'))
+			# unnamed: something related to `_main`
 
 			while block.readable():
 				call_adr = block.read_int() # offset 0
@@ -313,6 +341,12 @@ def parse_data(data, print = print, parse_0x08 = False):
 				elif cmd_type == 0x00:
 					typestr += ' (adr)'
 					assert get_type(_type) in ('var', 'const')
+				elif cmd_type == 0x0b:
+					# TODO found in the function named '' in main
+					typestr += ' (0x0b???)'
+				elif cmd_type == 0x0d:
+					# TODO found in setbit or something, iirc
+					typestr += ' (0x0b???)'
 				else: assert False, cmd_type
 
 
