@@ -65,7 +65,7 @@ b656	{Del LR} wait for key
 154ee	pop xr0
 157F0	r2 = r4
 168ac	r0 = r8, pop xr8
-168b0	pop xr8 (4 bytes).
+168b0	pop xr8
 16cec	{RT} ER0 += ER2
 1853a	r0 = r2 = 0
 1853c	r0 = r2
