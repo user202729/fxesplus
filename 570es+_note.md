@@ -389,7 +389,7 @@ Copy screen buffer to hardware screen.
 
 {RT} `memcpy`. (return `dest`)
 
-`char*(char* dest @ er0, char* source @ er2, unsigned length)`
+`char*(char* dest @ er0, char* source @ er2, unsigned length @ stack)`
 
 	char* result = dest // er8
 	// dest and source is moved to er4 and er12 resp.

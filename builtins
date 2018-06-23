@@ -21,52 +21,68 @@ Case-insensitive.
 
 #adr	description
 #----------------------
-2760	strcpy                                         # *er0 <- *er2
+
+2760	{Set LR} strcpy
 276A	[ER0] = R2
 29a8	pop xr12
 2aae	{RT} r0 >>= 4
 2cb0	r0 = r8, pop r8
 2d34	pop er4
-3136	{RT} Render, pop er0 qr8 xr4                   # *(stack-front) -> real screen
 3182	{RT} R0 = R2, pop xr8
 32a0	pop er0
 32a2	no-op
-3441	multiline ASCII                                # at ER0, R2 lines
-35b2	{Set LR} Render buffer
 3a68	pop er12
 3de2	r2 = r0
 440a	[er8] += er2, pop xr8
 442c	{RT} [er10] = er8, pop qr8
 44b2	pop er2
-4640	delay # by er2
 4722	{Set LR} KO = R2 = 0
 4f68	sp = er14, pop er14
 4f6a	pop er14
-
 7468	er2 = er0, pop er8
 746a	er0 = er2, pop er8
 746c	pop er8
+7ef8	{RT} memcpy, pop er14
 87fc	{RT} er0 = er2
 8aee	{RT} er2 = 1, r0 = 1
 87F6	er0 = max<unsigned>(er0, er2)
-a29e	pop er8, pc
-b460	{Del LR} getkeycode                            # will not modify r4~>r15
-b656	{Del LR} wait for key
 
 11d90	bl er12
-11e62	{Set LR} set lr                                # use after {Del LR} functions and before {RT} function
+# use after {Del LR} functions and before {RT} function
+11e62	{Set LR} set lr
 132f2	{RT} [er0] = er2
 13482	{RT} ER0 += ER2, ER8 = [ER0]
 13484	{RT} ER8 = [ER0]
 1417E	er0 = er8
 1441c	r0 = [er2]
-14558	r0 = 0, pop er14, pop r4
+14558	r0 = 0, pop er14 r4
 1468c	er8 = er0
 154ee	pop xr0
 157F0	r2 = r4
 168ac	r0 = r8, pop xr8
 168b0	pop xr8
+16CDA	memcpy, pop er0 er4
 16cec	{RT} ER0 += ER2
 1853a	r0 = r2 = 0
 1853c	r0 = r2
 19f9e	R0 &= 15
+1b48a	{RT} copy 10 bytes               # er0 <- er2
+
+# ====== Actual functions (or most of)
+# calling convention: register, if use stack, caller have to clean up
+
+3136	{RT} Render, pop er0 qr8 xr4     # *(stack-front) -> real screen
+3441	multiline ASCII                  # at ER0, R2 lines
+35b2	{Set LR} Render buffer
+4640	{RT} delay                       # by er0
+4ce8	{RT} memmove                     # similar to memcpy
+# er0 <- er2. Call 4e50. Do nothing if er2 == 0.
+7ef6	{RT} memcpy                      # er0 <- er2, len on stack
+8b82	{RT} strlen                      # (er0) -> er0
+96ea	{RT} strcat                      # er0 <- er2
+
+7e94	{RT} memset                      # (er0, er2, stack) -> er0
+8ba0	{RT} strchr                      # (er0, er2) -> er0
+
+b460	{Del LR} getkeycode              # don't modify r4~>r15
+b656	{Del LR} wait for key
