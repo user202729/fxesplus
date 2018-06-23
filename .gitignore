@@ -2,6 +2,7 @@ CasioEmu
 test
 disas_real_570es+.txt
 fx_570es+_disas.txt
+chartable.txt
 
 disas/bin
 disas/obj
