@@ -52,7 +52,7 @@ def get_commands(filename):
 			address, command = line.split('\t')
 		except ValueError:
 			raise Exception(f'Line {line_index} '+
-				'has too many tab characters')
+				'has an unexpected number of tab characters')
 
 		command = canonicalize(command)
 
@@ -65,12 +65,13 @@ def get_commands(filename):
 			tags.append(command[1:i])
 			command = command[i+1:]
 
-		if not command:
-			raise Exception(f'Line {line_index} has empty command')
-
-		if command in commands:
-			raise Exception(f'Command f{command} appears twice - '+
-				f'second occurence on line {line_index}')
+		assert command, f'Line {line_index} has empty command'
+		assert not command.endswith(':'), \
+			f'Command ends with ":" in line {line_index}'
+		assert ';' not in command, \
+			f'Command contains ";" in line {line_index}'
+		assert command not in commands, f'Command f{command} '+\
+			f'appears twice - second occurence on line {line_index}'
 
 		commands[command] = (int(address, 16), tuple(tags))
 
@@ -100,6 +101,12 @@ while program:
 
 	if not line: # empty line
 		pass
+
+	elif ';' in line:
+		''' Compound statement. Syntax:
+		`<statement1> ; <statement2> ; ...`
+		'''
+		program.extend(reversed(line.split(';')))
 
 	elif line[-1] == ':':
 		''' Syntax: `<label>:`
@@ -153,8 +160,15 @@ while program:
 		result.extend((0,0))
 
 	elif '=' in line:
+		''' Syntax:
+		`register = <value> [, adr_of <label> [, ...]]`
+		'''
 		i = line.index('=')
 		register, value = line[:i], line[i+1:].lstrip()
+
+		assert '=' not in value, f'Nested assignment in {line}'
+		value = value.replace(',', ';')
+
 		program.extend((value, f'call pop {register}'))
 
 	else:
