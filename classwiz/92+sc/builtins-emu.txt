@@ -1,0 +1,4 @@
+21E36	memset
+0939A	memzero # at er0, er2 bytes, call memset
+26606	probably reset routine
+
