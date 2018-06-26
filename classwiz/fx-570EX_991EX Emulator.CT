@@ -101,10 +101,10 @@
         <CheatEntry>
           <ID>782</ID>
           <Description>"&lt;Debug&gt;"</Description>
-          <LastState Value="4C" RealAddress="00F535DA"/>
+          <LastState Value="CE" RealAddress="00F4EB28"/>
           <ShowAsHex>1</ShowAsHex>
           <VariableType>Byte</VariableType>
-          <Address>+cfd2</Address>
+          <Address>+8520</Address>
         </CheatEntry>
       </CheatEntries>
     </CheatEntry>
@@ -153,10 +153,10 @@
             <CheatEntry>
               <ID>675</ID>
               <Description>"Test"</Description>
-              <LastState Value="00" RealAddress="012BFB2D"/>
+              <LastState Value="CE" RealAddress="012BE030"/>
               <ShowAsHex>1</ShowAsHex>
               <VariableType>Byte</VariableType>
-              <Address>+EB0D</Address>
+              <Address>+d010</Address>
             </CheatEntry>
           </CheatEntries>
         </CheatEntry>
@@ -279,7 +279,7 @@
             <CheatEntry>
               <ID>724</ID>
               <Description>"Function pressed (02740060)"</Description>
-              <LastState Value="0" RealAddress="00F6371E"/>
+              <LastState Value="36" RealAddress="00F6371E"/>
               <VariableType>Byte</VariableType>
               <Address>+D10E</Address>
             </CheatEntry>
@@ -294,7 +294,7 @@
             <CheatEntry>
               <ID>735</ID>
               <Description>"Mode"</Description>
-              <LastState Value="00" RealAddress="00F63721"/>
+              <LastState Value="C1" RealAddress="00F63721"/>
               <ShowAsHex>1</ShowAsHex>
               <VariableType>Byte</VariableType>
               <Address>+D111</Address>
@@ -331,21 +331,21 @@
             <CheatEntry>
               <ID>731</ID>
               <Description>"Angle unit (4,5,6:Deg,Rad,Grad)"</Description>
-              <LastState Value="0" RealAddress="00F6372D"/>
+              <LastState Value="4" RealAddress="00F6372D"/>
               <VariableType>Byte</VariableType>
               <Address>+D11D</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>733</ID>
               <Description>"Fraction result"</Description>
-              <LastState Value="0" RealAddress="00F6372E"/>
+              <LastState Value="1" RealAddress="00F6372E"/>
               <VariableType>Byte</VariableType>
               <Address>+D11E</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>728</ID>
               <Description>"Input/Output_MathI?"</Description>
-              <LastState Value="00" RealAddress="00F6372E"/>
+              <LastState Value="01" RealAddress="00F6372E"/>
               <ShowAsHex>1</ShowAsHex>
               <VariableType>Byte</VariableType>
               <Address>+D11E</Address>
@@ -353,14 +353,14 @@
             <CheatEntry>
               <ID>736</ID>
               <Description>"Complex a+bi?"</Description>
-              <LastState Value="0" RealAddress="00F63730"/>
+              <LastState Value="1" RealAddress="00F63730"/>
               <VariableType>Byte</VariableType>
               <Address>+D120</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>737</ID>
               <Description>"Statistics Freq on?"</Description>
-              <LastState Value="0" RealAddress="00F63731"/>
+              <LastState Value="1" RealAddress="00F63731"/>
               <VariableType>Byte</VariableType>
               <Address>+D121</Address>
             </CheatEntry>
@@ -382,14 +382,14 @@
             <CheatEntry>
               <ID>738</ID>
               <Description>"QR code version"</Description>
-              <LastState Value="0" RealAddress="00F6373E"/>
+              <LastState Value="11" RealAddress="00F6373E"/>
               <VariableType>Byte</VariableType>
               <Address>+D12E</Address>
             </CheatEntry>
             <CheatEntry>
               <ID>779</ID>
               <Description>"char height / ? (compare with 10)"</Description>
-              <LastState Value="0" RealAddress="00F63747"/>
+              <LastState Value="14" RealAddress="00F63747"/>
               <VariableType>Byte</VariableType>
               <Address>+D137</Address>
             </CheatEntry>
@@ -572,7 +572,7 @@
             <CheatEntry>
               <ID>719</ID>
               <Description>"Unstable character"</Description>
-              <LastState Value="0000" RealAddress="00F63928"/>
+              <LastState Value="0A9E" RealAddress="00F63928"/>
               <ShowAsHex>1</ShowAsHex>
               <VariableType>2 Bytes</VariableType>
               <Address>+D318</Address>
@@ -652,7 +652,7 @@
             <CheatEntry>
               <ID>710</ID>
               <Description>"X"</Description>
-              <LastState Value="00 00 00 00 00 00 00 00 00 00" RealAddress="00F6397A"/>
+              <LastState Value="02 50 00 00 00 00 00 00 87 00" RealAddress="00F6397A"/>
               <ShowAsHex>1</ShowAsHex>
               <VariableType>Array of byte</VariableType>
               <ByteLength>10</ByteLength>
@@ -661,7 +661,7 @@
             <CheatEntry>
               <ID>711</ID>
               <Description>"Y"</Description>
-              <LastState Value="00 00 00 00 00 00 00 00 00 00" RealAddress="00F63984"/>
+              <LastState Value="01 00 00 00 00 00 00 00 87 05" RealAddress="00F63984"/>
               <ShowAsHex>1</ShowAsHex>
               <VariableType>Array of byte</VariableType>
               <ByteLength>10</ByteLength>
@@ -927,7 +927,7 @@
             <CheatEntry>
               <ID>777</ID>
               <Description>"Screen buffer (24 bytes per line)"</Description>
-              <LastState Value="01 00 00 00 00 01 01 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00" RealAddress="00F643E4"/>
+              <LastState Value="00 00 00 00 00 01 01 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00" RealAddress="00F643E4"/>
               <ShowAsHex>1</ShowAsHex>
               <VariableType>Array of byte</VariableType>
               <ByteLength>24</ByteLength>
@@ -945,7 +945,7 @@
             <CheatEntry>
               <ID>856</ID>
               <Description>"End address for reset (f_26606)"</Description>
-              <LastState Value="00 00 00 00 00 00 00 00 00 7F 00 C0 18 00 00 60 00 01 80 00 0E 00 C0 00" RealAddress="00F649F4"/>
+              <LastState Value="00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00" RealAddress="00F649F4"/>
               <ShowAsHex>1</ShowAsHex>
               <VariableType>Array of byte</VariableType>
               <ByteLength>24</ByteLength>
@@ -978,7 +978,7 @@
             <CheatEntry>
               <ID>776</ID>
               <Description>"Screen (32 bytes per line, use 24 bytes, 64 lines) - line 1"</Description>
-              <LastState Value="00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00" RealAddress="00F65E10"/>
+              <LastState Value="00 00 00 00 00 01 01 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00" RealAddress="00F65E10"/>
               <ShowAsHex>1</ShowAsHex>
               <VariableType>Array of byte</VariableType>
               <ByteLength>24</ByteLength>
@@ -1003,7 +1003,7 @@
         <CheatEntry>
           <ID>781</ID>
           <Description>"*ER12"</Description>
-          <LastState Value="00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00" RealAddress="00F63E68"/>
+          <LastState Value="00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00" RealAddress="00F5F411"/>
           <ShowAsHex>1</ShowAsHex>
           <VariableType>Array of byte</VariableType>
           <ByteLength>24</ByteLength>
@@ -1015,7 +1015,7 @@
         <CheatEntry>
           <ID>612</ID>
           <Description>"stack front"</Description>
-          <LastState Value="00 00 02 33 14 00 00 14 01 FF D4 EF 8C 0B 14 66 02 00 E6 D0 00 76 00 00" RealAddress="00F655A6"/>
+          <LastState Value="04 2C 02 EF 00 8E 04 0E 01 8E 04 05 02 8E 04 18 10 8E 04 EE 00 90 04 B5" RealAddress="00F653EE"/>
           <ShowAsHex>1</ShowAsHex>
           <VariableType>Array of byte</VariableType>
           <ByteLength>24</ByteLength>
@@ -1029,7 +1029,7 @@
     <CheatEntry>
       <ID>694</ID>
       <Description>"Currently executing cmd first word"</Description>
-      <LastState Value="9641" RealAddress="012B2E6C"/>
+      <LastState Value="FE8F" RealAddress="00F4FBF2"/>
       <ShowAsHex>1</ShowAsHex>
       <VariableType>2 Bytes</VariableType>
       <Address>SimU8.dll+16CE50</Address>
@@ -1040,7 +1040,7 @@
     <CheatEntry>
       <ID>693</ID>
       <Description>"Currently executing cmd second word if any"</Description>
-      <LastState Value="EC81" RealAddress="012B2E6E"/>
+      <LastState Value="FE8F" RealAddress="00F4FBF4"/>
       <ShowAsHex>1</ShowAsHex>
       <VariableType>2 Bytes</VariableType>
       <Address>SimU8.dll+16CE50</Address>
@@ -1059,7 +1059,7 @@
     <CheatEntry>
       <ID>855</ID>
       <Description>"16 registers"</Description>
-      <LastState Value="00 00 00 00 58 D8 00 00 00 D0 00 00 58 D8 A0 EF" RealAddress="1016CEA4"/>
+      <LastState Value="02 00 50 A0 0E 00 C1 00 AA EF 03 00 01 8E 9A EF" RealAddress="1016CEA4"/>
       <ShowAsHex>1</ShowAsHex>
       <VariableType>Array of byte</VariableType>
       <ByteLength>16</ByteLength>
@@ -1068,7 +1068,7 @@
     <CheatEntry>
       <ID>690</ID>
       <Description>"CSR"</Description>
-      <LastState Value="2" RealAddress="1016CEBE"/>
+      <LastState Value="0" RealAddress="1016CEBE"/>
       <ShowAsHex>1</ShowAsHex>
       <VariableType>Binary</VariableType>
       <BitStart>0</BitStart>
@@ -1078,8 +1078,8 @@
     </CheatEntry>
     <CheatEntry>
       <ID>688</ID>
-      <Description>"PC &lt;SimU8engine.dll+1758&gt;"</Description>
-      <LastState Value="1E4C" RealAddress="1016CEB4"/>
+      <Description>"PC &lt;write@ SimU8engine.dll+1758&gt;"</Description>
+      <LastState Value="95EA" RealAddress="1016CEB4"/>
       <ShowAsHex>1</ShowAsHex>
       <VariableType>2 Bytes</VariableType>
       <Address>SimU8.dll+16CE20+94</Address>
@@ -1087,7 +1087,7 @@
     <CheatEntry>
       <ID>687</ID>
       <Description>"LR"</Description>
-      <LastState Value="93A4" RealAddress="1016CEB6"/>
+      <LastState Value="95B8" RealAddress="1016CEB6"/>
       <ShowAsHex>1</ShowAsHex>
       <VariableType>2 Bytes</VariableType>
       <Address>SimU8.dll+16CEB6</Address>
@@ -1106,7 +1106,7 @@
     <CheatEntry>
       <ID>685</ID>
       <Description>"PSW"</Description>
-      <LastState Value="AC" RealAddress="1016CEC3"/>
+      <LastState Value="00" RealAddress="1016CEC3"/>
       <ShowAsHex>1</ShowAsHex>
       <VariableType>Byte</VariableType>
       <Address>SimU8.dll+16CEC3</Address>
@@ -1114,7 +1114,7 @@
     <CheatEntry>
       <ID>684</ID>
       <Description>"SP push -&gt; decrease"</Description>
-      <LastState Value="EF96" RealAddress="1016CEC8"/>
+      <LastState Value="EDDE" RealAddress="1016CEC8"/>
       <ShowAsHex>1</ShowAsHex>
       <VariableType>2 Bytes</VariableType>
       <Address>SimU8.dll+16CEC8</Address>
@@ -1122,7 +1122,7 @@
     <CheatEntry>
       <ID>683</ID>
       <Description>"EA"</Description>
-      <LastState Value="EF53" RealAddress="1016CECA"/>
+      <LastState Value="EF93" RealAddress="1016CECA"/>
       <ShowAsHex>1</ShowAsHex>
       <VariableType>2 Bytes</VariableType>
       <Address>SimU8.dll+16CECA</Address>

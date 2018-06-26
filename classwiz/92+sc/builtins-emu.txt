@@ -1,4 +1,55 @@
-21E36	memset
-0939A	memzero # at er0, er2 bytes, call memset
-26606	probably reset routine
+Library builtins and BL-able addresses (functions).
+Does NOT include gadgets.
 
+Arguments are 0-indexing.
+
+Smart functions (special case NULL)
+
+203C2	smart strcpy_nn (copy to NULL = no-op, copy from NULL = "")
+203b8	smart strlen_n (len(NULL) == 0)
+
+8598	1-line ascii (default parameter: r0 (xpos) = 0)
+8A8C	Render screen (with 2 set of default parameters)
+939A	memzero # at er0, er2 bytes, call memset
+2157C	set size to 14, 1-line ascii? (er2: adr, r0: ypos, xpos = 0)
+21E36	memset
+26606	probably reset routine
+24A3A	table lookup (perhaps to get address of error message) er0->er0
+
+x -> [[6f04+2*[uint8_t d12b]]+2*x-2] (3 layers of indirection? ...)
+I guess: (pseudo C code)
+
+	char* get_string(int string_index){
+		uint8_t table_index = *(uint8_t*)0xd12b; // this may be an ENUM
+		char*** tables = 0x6f04; // three star programmer :P
+		char**  table  = tables[table_index];
+		char*   string = table[string_index - 1];
+		return string;
+	}
+
+2D010	(probably) strcpy string with index (arg0) to (arg1)
+
+0851E	Huge function allocate lots of mem
+08FB0	something call 851e
+09086	something call 8FB0. (very likely) show syntax error message
+
+
+B044	f_0AFEC.l_058	Wait for key?
+
+acaa	ENTER (backup registers, set frame pointer er14)
+acb2	LEAVE (restore registers)
+# Usage: 'bl ENTER; ......; b LEAVE;'
+
+Fn _strcpy_nn, adr f726
+Fn _strcat_nn, adr 33864
+Fn _strlen_f, adr 2b2a4
+Fn _memset_f, adr 22294
+Fn _memcpy_nf, adr 27568
+Fn _strcat_fn, adr 32c74
+Fn _memcpy_nn, adr 283ac
+Fn _memmove_nn, adr a66e
+Fn _memcpy_fn, adr 2904e
+Fn _strlen_n, adr 2b4e4
+Fn _abs, adr f3c8
+Fn _strcpy_fn, adr ec0a
+Fn _memset_n, adr 21e36
