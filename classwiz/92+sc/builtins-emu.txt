@@ -48,6 +48,8 @@ f_24A3A		get_string_constant
 f_2CFE0		f_2CFE0
 .l_030		get_string_and_length
 # from string index
+f_08668		1char_print.1byte_char
+.l_00A		1char_print
 
 
 f_2140C		diagnostic_function
