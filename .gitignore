@@ -1,8 +1,8 @@
 CasioEmu
 test
-**/*disas*.txt
 chartable.txt
 
+classwiz/92+sc/disassembler*.lua
 disas/bin
 disas/obj
 
@@ -13,3 +13,5 @@ wine_tools/main.*
 wine_tools/obj
 
 **/__pycache__
+**/*disas*.txt
+

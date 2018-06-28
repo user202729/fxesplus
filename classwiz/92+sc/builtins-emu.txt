@@ -50,6 +50,7 @@ f_2CFE0		f_2CFE0
 # from string index
 
 
+f_2140C		diagnostic_function
 f_25604		diagnostic_section
 # a section of diagnostic procedure
 

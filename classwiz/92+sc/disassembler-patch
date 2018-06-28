@@ -1,0 +1,10 @@
+993a994
+> 	local void_context = {name = ''}
+1002c1003
+< 		local raw, real = line:match("([%w_%.]+)%s+([%w_%.]+)")
+---
+> 		local raw, real = line:match("^%s*([%w_%.]+)%s+([%w_%.]+)")
+1019a1021
+> 			label.context = void_context
+1026a1029
+> 			datalabel.context = void_context
