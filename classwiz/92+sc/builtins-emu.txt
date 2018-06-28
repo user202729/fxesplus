@@ -1,55 +1,71 @@
-Library builtins and BL-able addresses (functions).
-Does NOT include gadgets.
+# Library builtins and BL-able addresses (functions).
+# Does NOT include gadgets.
 
-Arguments are 0-indexing.
+# Arguments are 0-indexing.
+# All lines with '#' won't match the Lua pattern so they're effectively
+# comments. Comment for something is put **after** it.
 
-Smart functions (special case NULL)
+# ========= Library function
 
-203C2	smart strcpy_nn (copy to NULL = no-op, copy from NULL = "")
-203b8	smart strlen_n (len(NULL) == 0)
+f_0F726		strcpy_nn
+f_33864		strcat_nn
+f_2B2A4		strlen_f
+f_22294		memset_f
+f_27568		memcpy_nf
+f_32C74		strcat_fn
+f_283AC		memcpy_nn
+f_0A66E		memmove_nn
+f_2904E		memcpy_fn
+f_2B4E4		strlen_n
+f_0F3C8		abs
+f_0EC0A		strcpy_fn
+f_21E36		memset_n
 
-8598	1-line ascii (default parameter: r0 (xpos) = 0)
-8A8C	Render screen (with 2 set of default parameters)
-939A	memzero # at er0, er2 bytes, call memset
-2157C	set size to 14, 1-line ascii? (er2: adr, r0: ypos, xpos = 0)
-21E36	memset
-26606	probably reset routine
-24A3A	table lookup (perhaps to get address of error message) er0->er0
+# ========= Smart functions (special case NULL)
 
-x -> [[6f04+2*[uint8_t d12b]]+2*x-2] (3 layers of indirection? ...)
-I guess: (pseudo C code)
+f_203C2		smart_strcpy_nn
+# copy to NULL = no-op, copy from NULL = ""
+f_203B8		smart_strlen_n
+# len(NULL) == 0
 
-	char* get_string(int string_index){
-		uint8_t table_index = *(uint8_t*)0xd12b; // this may be an ENUM
-		char*** tables = 0x6f04; // three star programmer :P
-		char**  table  = tables[table_index];
-		char*   string = table[string_index - 1];
-		return string;
-	}
+# ========= Calculator functions
 
-2D010	(probably) strcpy string with index (arg0) to (arg1)
+f_08598		1line_print
+# r0: col, r1: row, er2: address
+.l_002		1line_print.col_0
+f_08A8C		render.e3d4
+.l_00C		render.ddd4
+# copy content at (position) to screen
+f_0939A		memzero
+# at er0, er2 bytes, call memset
+f_2157C		1line_print__size_14
+# er2: adr, xpos = 0, ypos = r0; call 1line_print.col_0
+# ???
+f_26606		probably reset routine
+f_24A3A		get_string_constant
+# It appears that only [0xd12b]==0 makes sense
+# Run `extract-table.py`. Decompiled.
+f_2CFE0		f_2CFE0
+.l_030		get_string_and_length
+# from string index
 
-0851E	Huge function allocate lots of mem
-08FB0	something call 851e
-09086	something call 8FB0. (very likely) show syntax error message
 
+f_25604		diagnostic_section
+# a section of diagnostic procedure
 
-B044	f_0AFEC.l_058	Wait for key?
+f_0AFEC		f_0AFEC
+.l_058		wait_key
 
-acaa	ENTER (backup registers, set frame pointer er14)
-acb2	LEAVE (restore registers)
+f_acaa		ENTER
+# backup registers, set frame pointer er14
+f_acb2		LEAVE
+# restore registers
 # Usage: 'bl ENTER; ......; b LEAVE;'
 
-Fn _strcpy_nn, adr f726
-Fn _strcat_nn, adr 33864
-Fn _strlen_f, adr 2b2a4
-Fn _memset_f, adr 22294
-Fn _memcpy_nf, adr 27568
-Fn _strcat_fn, adr 32c74
-Fn _memcpy_nn, adr 283ac
-Fn _memmove_nn, adr a66e
-Fn _memcpy_fn, adr 2904e
-Fn _strlen_n, adr 2b4e4
-Fn _abs, adr f3c8
-Fn _strcpy_fn, adr ec0a
-Fn _memset_n, adr 21e36
+# ========= Functions with not enough information
+
+#f_0851E		Huge function allocate lots of mem. Default arg r0=0.
+#f_08FB0		something call 851e
+#f_09006		1 line print ??? or what? what's the difference with 8598 ?
+#f_09028		Probably configure font size?
+#f_09086		something call 8FB0. (very likely) show syntax error message

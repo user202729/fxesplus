@@ -1,0 +1,16 @@
+// (int) is 16-bit
+
+char* get_string_constant(int string_index){
+	uint8_t table_index = *(uint8_t*)0xd12b; // this may be an ENUM
+	char*** tables = 0x6f04; // three star programmer :P
+	char**  table  = tables[table_index];
+	char*   string = table[string_index - 1];
+	return string;
+}
+
+int get_string_and_length(int string_index, char* dest){
+	if (dest == NULL) return 0;
+	char* str = get_string(string_index);
+	strcpy(dest, str);
+	return strlen(dest);
+}
