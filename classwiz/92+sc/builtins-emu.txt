@@ -30,9 +30,9 @@ f_203B8		smart_strlen_n
 
 # ========= Calculator functions
 
-f_08598		1line_print
+f_08598		1line_print.col_0
 # r0: col, r1: row, er2: address
-.l_002		1line_print.col_0
+.l_002		1line_print
 f_08A8C		render.e3d4
 .l_00C		render.ddd4
 # copy content at (position) to screen
@@ -41,7 +41,8 @@ f_0939A		memzero
 f_2157C		1line_print__size_14
 # er2: adr, xpos = 0, ypos = r0; call 1line_print.col_0
 # ???
-f_26606		probably reset routine
+f_26606		reset_routine
+# I think so
 f_24A3A		get_string_constant
 # It appears that only [0xd12b]==0 makes sense
 # Run `extract-table.py`. Decompiled.
@@ -68,7 +69,8 @@ f_acb2		LEAVE
 # ========= Functions with not enough information
 
 #f_0851E		Huge function allocate lots of mem. Default arg r0=0.
+# probably this prints multiple lines, address in the table
 #f_08FB0		something call 851e
-#f_09006		1 line print ??? or what? what's the difference with 8598 ?
+#.l_056			1 line print ??? or what? what's the difference with 8598 ?
 #f_09028		Probably configure font size?
 #f_09086		something call 8FB0. (very likely) show syntax error message
