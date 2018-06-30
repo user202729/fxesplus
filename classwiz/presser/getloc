@@ -1,0 +1,8 @@
+eval $(xdotool getmouselocation -s)
+x=$X
+y=$Y
+xdotool mousemove --window $WINDOW 0 0
+eval $(xdotool getmouselocation -s)
+xdotool mousemove $x $y
+echo $((x-X)) $((y-Y))
+

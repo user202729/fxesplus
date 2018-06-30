@@ -1,0 +1,28 @@
+#!/usr/bin/sh
+# Type a box on CLASSWIZ calculator emulator.
+xdotool search --name 'fx.*Emulator' windowfocus --sync
+./mmove 100 100
+xdotool click 1 # True focus.
+
+./mmove 100 347 # Position for F6 key (x^2 on 92+sc)
+xdotool key 1 slash 1 Shift+9 Shift+9 1 # '1/1((1'
+for i in $(seq 1 12); do
+	# This enter a '√' character
+	xdotool key F1
+	xdotool click 1
+done
+xdotool key 1
+for i in $(seq 1 12); do
+	xdotool key Right
+done
+
+# Finally enter ':√⎕'
+xdotool key F1 equal F1
+xdotool click 1
+
+./mmove 64 379 # Position for 'q' key (CALC on 92+sc)
+xdotool click 1 key Return Right Right Delete Left
+for i in $(seq 1 39); do
+	xdotool key Delete
+done
+

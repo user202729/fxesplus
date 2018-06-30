@@ -1,0 +1,22 @@
+#!/usr/bin/sh
+# 
+xdotool search --name 'fx.*Emulator' windowfocus --sync
+./mmove 100 100
+xdotool click 1 # True focus.
+
+./mmove 258 378 # Position for 'y' key (ln/e^ on 92+sc)
+for i in $(seq 1 13); do
+	# This enter a 'e^' character
+	xdotool key F1
+	xdotool click 1
+done
+for i in $(seq 1 13); do
+	if [ $((i % 5)) == 1 ]; then
+		xdotool key x
+	fi
+	xdotool key Right
+done
+
+# Finally enter ':Pol(1,0)'
+xdotool key F1 equal F1 Shift+equal 1 F1 3 0
+

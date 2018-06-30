@@ -1,0 +1,4 @@
+#!/usr/bin/sh
+# Move the mouse relative to the focused window.
+xdotool getwindowfocus mousemove --window %1 $*
+
