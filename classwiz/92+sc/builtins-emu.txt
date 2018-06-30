@@ -49,27 +49,41 @@ f_24A3A		get_string_constant
 f_2CFE0		f_2CFE0
 .l_030		get_string_and_length
 # from string index
+f_0851E		str_decompress_print
 f_08668		1char_print.1byte_char
 .l_00A		1char_print
-
-
-f_2140C		diagnostic_function
-f_25604		diagnostic_section
-# a section of diagnostic procedure
+# Return value: {char, char*} :
+# number of char printed, end pointer
+f_095AA		delay
 
 f_0AFEC		f_0AFEC
-.l_058		wait_key
 
-f_acaa		ENTER
+f_0ACAA		ENTER
 # backup registers, set frame pointer er14
-f_acb2		LEAVE
+f_0ACB2		LEAVE
 # restore registers
 # Usage: 'bl ENTER; ......; b LEAVE;'
 
+f_099B6		_start
+f_2AD84		main
+
+f_21740		save_all_regs # right before FP
+
+# ========= Real specific functions (KI/KO)
+
+f_097DA		zero_KO
+f_2140C		diagnostic_function
+f_25604		diagnostic_section
+# a section of diagnostic procedure
+.l_058		real_wait_key
+f_21750		compute_checksum
+f_216A4		checksum_screen
+
+# ========= Emulator specific functions (KI/KO)
+f_22B16		emu_wait_key
+
 # ========= Functions with not enough information
 
-#f_0851E		Huge function allocate lots of mem. Default arg r0=0.
-# probably this prints multiple lines, address in the table
 #f_08FB0		something call 851e
 #.l_056			1 line print ??? or what? what's the difference with 8598 ?
 #f_09028		Probably configure font size?

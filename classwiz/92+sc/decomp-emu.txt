@@ -14,3 +14,45 @@ int get_string_and_length(int string_index, char* dest){
 	strcpy(dest, str);
 	return strlen(dest);
 }
+
+{char, char*} str_decompress_print(char col, char row, char* b){
+	char mem[64];
+	char* mem_end = mem;
+	char* end_pointer = b + smart_strlen_n(b); // store in er6
+	char r0;
+
+	for (char* er10 = b; (r0 = *er10) != 0; ++er10) { // .l_020, 0853E
+		if (r0 == 2 || r0 == 4) { // represent a string in table
+
+			++er10;
+			if (r0 == 2) {
+				r0 = *er10;
+				r1 = 0
+			} else { // r0 == 4
+				r0 = *er10;
+				--r0;
+				r1 = 1;
+			}
+
+			// append it to (mem)
+			get_string_and_length(er0, mem_end);
+			mem_end += r0;
+
+		} else { // represent a literal character
+
+			// append the character to (mem)
+			*mem_end = r0;
+			++mem_end;
+		}
+	}
+
+	*mem_end = 0;
+	if (smart_strlen_n(mem) > 34)
+		smart_strcpy_nn(mem, "ERROR"); // 0x1c20
+
+	return {
+		nchar_printed = 1line_print(coord, mem).nchar_printed,
+		end_pointer = end_pointer
+	};
+}
+
