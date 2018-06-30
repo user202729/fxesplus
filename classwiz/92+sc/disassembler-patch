@@ -1,10 +1,21 @@
-993a994
+3c3,10
+< if not bit then
+---
+> if (_VERSION):sub(4, 4)==' ' and (_VERSION):sub(5) >= '5.3' then
+> 	function bit.band(a, b) return a & b end
+> 	function bit.bor (a, b) return a | b end
+> 	function bit.bxor(a, b) return a ~ b end
+> 	function bit.lshift(a, b) return a << b end
+> 	function bit.rshift(a, b) return a >> b end
+> 	
+> elseif not bit then
+993a1001
 > 	local void_context = {name = ''}
-1002c1003
+1002c1010
 < 		local raw, real = line:match("([%w_%.]+)%s+([%w_%.]+)")
 ---
 > 		local raw, real = line:match("^%s*([%w_%.]+)%s+([%w_%.]+)")
-1019a1021
+1019a1028
 > 			label.context = void_context
-1026a1029
+1026a1036
 > 			datalabel.context = void_context
