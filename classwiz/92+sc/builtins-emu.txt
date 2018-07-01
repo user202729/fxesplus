@@ -1,4 +1,5 @@
 # Library builtins and BL-able addresses (functions).
+# Also contains data labels.
 # Does NOT include gadgets.
 
 # Arguments are 0-indexing.
@@ -49,14 +50,14 @@ f_24A3A		get_string_constant
 f_2CFE0		f_2CFE0
 .l_030		get_string_and_length
 # from string index
+f_08228		clear_screen
 f_0851E		str_decompress_print
 f_08668		1char_print.1byte_char
 .l_00A		1char_print
+# Print to buffer 2 (may be changed, I don't know)
 # Return value: {char, char*} :
 # number of char printed, end pointer
 f_095AA		delay
-
-f_0AFEC		f_0AFEC
 
 f_0ACAA		ENTER
 # backup registers, set frame pointer er14
@@ -75,6 +76,7 @@ f_097DA		zero_KO
 f_2140C		diagnostic_function
 f_25604		diagnostic_section
 # a section of diagnostic procedure
+f_0AFEC		f_0AFEC
 .l_058		real_wait_key
 f_21750		compute_checksum
 f_216A4		checksum_screen
@@ -84,7 +86,15 @@ f_22B16		emu_wait_key
 
 # ========= Functions with not enough information
 
-#f_08FB0		something call 851e
+#f_08FB0		multiline decompress?
 #.l_056			1 line print ??? or what? what's the difference with 8598 ?
 #f_09028		Probably configure font size?
 #f_09086		something call 8FB0. (very likely) show syntax error message
+
+# ========= Data labels (also see the cheat table)
+
+d_0D110		modifiers
+# Ins(80)/Shift(8)/Alpha(4)/Sto(1)
+d_0D111		mode
+d_0D112		sub_mode
+d_0D137		font_size

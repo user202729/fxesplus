@@ -16,7 +16,8 @@ def fetch_int(adr):
 for adr_table in range(tables,tables+2,2):
 	table=fetch_int(adr_table)
 	table_len=0
-	for adr_string in range(table,table+2*n_entry,2):
+	for index_string in range(n_entry):
+		adr_string = table+2*index_string
 		string=fetch_int(adr_string)
 		str_len=rom[string:string+2*max_nchar].find(0)
 		str_content=rom[string:string+str_len]
@@ -26,7 +27,7 @@ for adr_table in range(tables,tables+2,2):
 		if table_len==0:
 			print(f'* {table:#0{6}x}\n')
 		table_len+=1
-		print(f'    {string:0{4}x}\t'+
+		print(f'    {index_string:0{4}x}    {string:0{4}x}\t'+
 			repr(chr(rom[string-1])).ljust(8)+
 			repr(rom[string:string+str_len])[1:])
 	if table_len==0:break

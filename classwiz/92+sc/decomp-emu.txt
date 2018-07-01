@@ -56,3 +56,17 @@ int get_string_and_length(int string_index, char* dest){
 	};
 }
 
+void clear_screen(char filler, char mode){
+	if(mode == 4){ // screen buffer 2
+		memset_n(0xe3d4, filler, 0x600);
+		return;
+	}
+
+	if(mode & 1){ // screen buffer 1
+		memset_n(0xddd4, filler, 0x600);
+	}
+
+	if(mode & 2){ // real screen
+		memset_n(0xf800, filler, 0x800);
+	}
+}
