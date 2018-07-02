@@ -68,6 +68,9 @@ f_0ACB2		LEAVE
 f_099B6		_start
 f_2AD84		main
 
+f_08A5C		buf1_to_buf2
+f_08A74		buf2_to_buf1
+# copy between the two screen buffers (1 at 0xDDD4, 2 at 0xE3D4)
 f_21740		save_all_regs # right before FP
 
 # ========= Real specific functions (KI/KO)

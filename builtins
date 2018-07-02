@@ -53,7 +53,7 @@ Case-insensitive.
 132f2	{RT} [er0] = er2
 13482	{RT} ER0 += ER2, ER8 = [ER0]
 13484	{RT} ER8 = [ER0]
-1417E	er0 = er8
+1417E	er0 = er8                        # expensive
 1441c	r0 = [er2]
 14558	r0 = 0, pop er14 r4
 1468c	er8 = er0
