@@ -82,16 +82,6 @@ def get_commands(filename):
 	return commands
 commands = get_commands('builtins')
 
-def print_symbols_table():
-	'''
-	Print all symbols in table form. For testing purposes.
-	I keep it because it looks nice.
-	'''
-	colwidth = max(map(len,symbols)) + 1
-	for i in range(256):
-		print(symbols[i].ljust(colwidth), end='')
-		if i % 16 == 15: print()
-
 program = sys.stdin.read().split('\n')[::-1]
 program =[canonicalize(del_inline_comment(line))for line in program]
 result = [] # list of ints in range 0..255
