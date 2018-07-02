@@ -51,7 +51,7 @@ def get_commands(filename):
 		try:
 			address, command = line.split('\t')
 		except ValueError:
-			raise Exception(f'Line {line_index} '+
+			raise Exception(f'Line {line_index} '
 				'has an unexpected number of tab characters')
 
 		command = canonicalize(command)
@@ -60,17 +60,21 @@ def get_commands(filename):
 		while command and command[0] == '{':
 			i = command.find('}')
 			if i < 0:
-				raise Exception(f'Line {line_index} '+
+				raise Exception(f'Line {line_index} '
 					'has unmatched "{"');
 			tags.append(command[1:i])
 			command = command[i+1:]
 
 		assert command, f'Line {line_index} has empty command'
+
+		for disallowed_prefix in '0x', 'call', 'goto', 'adr_of':
+			assert not command.startswith(disallowed_prefix), \
+			f'Command ends with "{disallowed_prefix}" in line {line_index}'
 		assert not command.endswith(':'), \
 			f'Command ends with ":" in line {line_index}'
 		assert ';' not in command, \
 			f'Command contains ";" in line {line_index}'
-		assert command not in commands, f'Command f{command} '+\
+		assert command not in commands, f'Command f{command} '\
 			f'appears twice - second occurence on line {line_index}'
 
 		commands[command] = (int(address, 16), tuple(tags))
@@ -96,7 +100,6 @@ labels = {}
 adr_of_cmds = [] # list of (source adr, offset, target label)
 
 while program:
-	print(program)
 	line = program.pop()
 
 	if not line: # empty line
@@ -127,7 +130,7 @@ while program:
 			data>>=8
 
 	elif line.startswith('call'):
-		''' Syntax: `call <address>` or `call <builtin>`'''
+		''' Syntax: `call <address>` or `call <built-in>`. '''
 		try:
 			adr = int(line[4:], 16)
 		except ValueError:
@@ -141,7 +144,7 @@ while program:
 		''' Syntax: `goto <label>` '''
 		label = line[4:]
 		program.extend((
-			'call sp=er14,pop er14'
+			'call sp=er14,pop er14',
 			f'er14 = adr_of [-2] {label}'
 		))
 
@@ -159,6 +162,10 @@ while program:
 		adr_of_cmds.append((len(result), offset, label))
 		result.extend((0,0))
 
+	elif line in commands:
+		''' `<built-in>`. Equivalent to `call <built-in>`. '''
+		program.append('call '+line)
+
 	elif '=' in line:
 		''' Syntax:
 		`register = <value> [, adr_of <label> [, ...]]`
@@ -171,6 +178,14 @@ while program:
 
 		program.extend((value, f'call pop {register}'))
 
+	elif line[0] == '$':
+		''' Python eval. '''
+		x = eval(line[1:])
+		if isinstance(x, str):
+			program.append(x)
+		else:
+			program.extend(x)
+
 	else:
 		assert False, f'Unrecognized command: {line}'
 
@@ -180,7 +195,7 @@ adr_of_cmds = [(source_adr, labels[target_label]+offset)
 	for source_adr, offset, target_label in adr_of_cmds]
 # now it's a list of (source adr, offset relative to `home`)
 
-home = 0x8D9E # initial value of SP after POP PC
+home = 0x8DA4 # initial value of SP before POP PC
 if home + len(result) > 0x8E00:
 	sys.stderr.write('Warning: Program longer than 92 bytes')
 if 'home' in labels: home -= labels['home'] # confusing? ...
@@ -190,9 +205,9 @@ while min_home >= 0x8154+100: min_home -= 100
 while home + len(result) <= 0x8E00: home += 100 # 0x8E00: end of RAM
 home = min(range(min_home, home, 100), key=lambda home:
 	(
-		sum(get_npress(( # count number of ... satisfy condition
-			(home+home_offset)&0xFF, (home+home_offset)>>8
-		)) >= 100 for source_adr, home_offset in adr_of_cmds),
+		sum( # count number of ... satisfy condition
+			get_npress_adr(home+home_offset) >= 100
+			for source_adr, home_offset in adr_of_cmds),
 		-home # if ties then take max `home`
 	)
 )
@@ -200,14 +215,15 @@ home = min(range(min_home, home, 100), key=lambda home:
 # home is picked now, now substitute in the result
 for source_adr, home_offset in adr_of_cmds:
 	target_adr = home + home_offset
-	assert target[source_adr] == 0
-	target[source_adr] = target_adr & 0xFF
-	assert target[source_adr+1] == 0
-	target[source_adr+1] = target_adr >> 8
+	assert result[source_adr] == 0
+	result[source_adr] = target_adr & 0xFF
+	assert result[source_adr+1] == 0
+	result[source_adr+1] = target_adr >> 8
 
 # scroll it around (use the most inefficient way)
-hackstring = list(map(ord,'0123456789'*10)) # but still O(n)
+hackstring = list(map(ord,'1234567890'*10)) # but still O(n)
 for home_offset, byte in enumerate(result):
+	assert isinstance(byte, int), (home_offset, byte)
 	hackstring[(home+home_offset-0x8154)%100] = byte
 
 # done
