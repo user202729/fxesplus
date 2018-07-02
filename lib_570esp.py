@@ -47,15 +47,21 @@ def get_npress(charcodes):
 	4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,
 	4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  100,
 	)
-	if isinstance(charcodes, int): charcodes = [charcodes]
+	if isinstance(charcodes, int): charcodes = (charcodes,)
 	return sum(npress[charcode] for charcode in charcodes)
+
+def get_npress_adr(adrs):
+	if isinstance(adrs, int): adrs = (adrs,)
+	assert all(0 <= adr < 0x20000 for adr in adrs)
+	return sum(get_npress((adr&0xFF,(adr>>8)&0xFF)) for adr in adrs)
+
 def optimize_adr_for_npress(adr):
 	'''
 	For a 'POP PC' command, the lowest significant bit in the address
 	does not matter. This function use that fact to minimize number
 	of key strokes used to enter the hackstring.
 	'''
-	return min((adr, adr^1), key=lambda adr: get_npress(adr&0xFF))
+	return min((adr, adr^1), key=get_npress_adr)
 
 def get_binary(filename):
 	file = open(filename, 'rb')
@@ -99,3 +105,9 @@ def to_key(byte):
 
 	return symbols[byte]
 
+def optimize_sum_for_npress(total):
+	''' Return (a, b) such that a + b == total. '''
+	return ['0x'+hex(x)[2:].zfill(4) for x in min(
+		((x, (total-x)%0x10000) for x in range(0x0101, 0x10000)),
+		key=get_npress_adr
+	)]
