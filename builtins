@@ -36,7 +36,7 @@ Case-insensitive.
 440a	[er8] += er2, pop xr8
 442c	{RT} [er10] = er8, pop qr8
 44b2	pop er2
-4722	{Set LR} KO = R2 = 0
+4722	{Set LR} KO = R2 = 0             # expensive
 4f68	sp = er14, pop er14
 4f6a	pop er14
 7468	er2 = er0, pop er8
