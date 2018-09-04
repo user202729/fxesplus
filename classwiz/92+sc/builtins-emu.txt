@@ -72,6 +72,8 @@ f_08A5C		buf1_to_buf2
 f_08A74		buf2_to_buf1
 # copy between the two screen buffers (1 at 0xDDD4, 2 at 0xE3D4)
 f_21740		save_all_regs # right before FP
+f_2C86A		byte_strlen_n # strlen, but returns byte
+f_0A6DA		max_input_len # 200 or 50 or 49
 
 # ========= Real specific functions (KI/KO)
 
@@ -99,5 +101,6 @@ f_22B16		emu_wait_key
 d_0D110		modifiers
 # Ins(80)/Shift(8)/Alpha(4)/Sto(1)
 d_0D111		mode
+# C1comp.03stat.0Dsheet.88tab.45eqn.89ver.4Arat.0Ealg
 d_0D112		sub_mode
 d_0D137		font_size
