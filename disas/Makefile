@@ -4,6 +4,8 @@ CXX ?= g++
 RM  ?= rm -f
 CCFLAGS ?= -D_GLIBCXX_DEBUG -O2 -std=c++14 -Wall -Wextra -Werror -pedantic
 
+_dummy := $(shell mkdir -p obj bin)
+
 bin/u8-disas: nX-U8_is.txt bin/main Makefile example.cpp
 	@bin/main $< temp.cpp
 	@$(CXX) $(CCFLAGS) temp.cpp -o $@

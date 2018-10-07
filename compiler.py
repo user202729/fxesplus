@@ -7,7 +7,7 @@ from lib_570esp import *
 '''
 Only provide 0 or 1 cmdline argument: output format.
 '''
-assert len(sys.argv) < 2, 'Too many command-line arguments'
+assert len(sys.argv) <= 2, 'Too many command-line arguments'
 output_format = 'k' if len(sys.argv) == 1 else dict(
 	h = 'h', hex = 'h', hexadecimal = 'h',
 	k = 'k', key = 'k', keys = 'k', keypresses = 'k',

@@ -1,3 +1,5 @@
+# Invoking this directly does nothing, instead, import this as a library.
+
 def get_font(filename = 'font'):
 	file = open(filename, 'r')
 	font = ''

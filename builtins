@@ -49,7 +49,7 @@ Case-insensitive.
 
 11d90	bl er12
 # use after {Del LR} functions and before {RT} function
-11e62	{Set LR} set lr
+11e63	{Set LR} set lr
 132f2	{RT} [er0] = er2
 13482	{RT} ER0 += ER2, ER8 = [ER0]
 13484	{RT} ER8 = [ER0]
