@@ -113,3 +113,19 @@ def optimize_sum_for_npress(total):
 		((x, (total-x)%0x10000) for x in range(0x0101, 0x10000)),
 		key=get_npress_adr
 	)]
+
+# Initialize keymap. Useful for the hackstring loader using getkeycode.
+with open('keymap/table', 'r') as file:
+	keymap = file.read().split()
+assert len(keymap) == 256
+keymap = [None if x=="'" else x for x in keymap]
+
+keymap_pair_with_sum = [None]*256
+for i in range(256):
+	for j in range(256):
+		if keymap[i] and keymap[j]:
+			keymap_pair_with_sum[(i+j)&0xFF] = (keymap[i], keymap[j])
+def print_keymap_pairs(hex_string):
+	hex_string = ''.join(hex_string.split())
+	for i in range(0, len(hex_string), 2):
+		print(keymap_pair_with_sum[int(hex_string[i:i+2],16)])
