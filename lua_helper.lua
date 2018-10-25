@@ -34,8 +34,12 @@ end
 p = print
 
 function inject(str)
-	if 200 ~= #str then
-		print "Input 200 hexadecimal digits please"
+	if #str > 200 then
+		print "Input at most 200 hexadecimal digits please"
+		return
+	end
+	if #str % 2 != 0 then
+		print "Input an even number of hexadecimal digits please"
 		return
 	end
 
@@ -45,6 +49,20 @@ function inject(str)
 		adr = adr + 1
 	end
 end
+
+function dump_data(adr)
+	if not adr then
+		adr = 0x8154
+	end
+	result = ''
+	repeat
+		byte = data[adr]
+		result = result .. ('%02x'):format(byte)
+		adr = adr + 1
+	until byte == 0 or #result == 200
+	print result
+end
+
 
 function pr_stack(radius)
 	radius = radius or 48
