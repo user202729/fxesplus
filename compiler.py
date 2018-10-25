@@ -1,16 +1,19 @@
 #!/usr/bin/python3
 import re
 import sys
+import os
 
 from lib_570esp import *
 
 '''
 Only provide 0 or 1 cmdline argument: output format.
 '''
-assert len(sys.argv) <= 2, 'Too many command-line arguments'
+assert len(sys.argv) < 3, 'Too many command-line arguments'
 output_format = 'k' if len(sys.argv) == 1 else dict(
 	h = 'h', hex = 'h', hexadecimal = 'h',
 	k = 'k', key = 'k', keys = 'k', keypresses = 'k',
+        j = 'j', justcode = 'j', code = 'j', raw = 'j',
+        l = 'l', loader = 'l'
 )[sys.argv[1]]
 
 def canonicalize(st):
@@ -88,6 +91,8 @@ result = [] # list of ints in range 0..255
 
 labels = {}
 adr_of_cmds = [] # list of (source adr, offset, target label)
+
+home = None
 
 while program:
 	line = program.pop()
@@ -176,39 +181,58 @@ while program:
 		else:
 			program.extend(x)
 
+	elif line.startswith('org'):
+		hx = eval(line[3:])
+		home = hx - len(result)
+
 	else:
 		assert False, f'Unrecognized command: {line}'
 
-assert len(result) <= 100, 'Program too long'
-
 adr_of_cmds = [(source_adr, labels[target_label]+offset)
-	for source_adr, offset, target_label in adr_of_cmds]
+    for source_adr, offset, target_label in adr_of_cmds]
+
+if output_format in ('k', 'h'):
+    assert len(result) <= 100, 'Program too long'
+
 # now it's a list of (source adr, offset relative to `home`)
 
-home = 0x8DA4 # initial value of SP before POP PC
-if home + len(result) > 0x8E00:
-	sys.stderr.write('Warning: Program longer than 92 bytes')
-if 'home' in labels: home -= labels['home'] # confusing? ...
-
-min_home = home
-while min_home >= 0x8154+100: min_home -= 100
-while home + len(result) <= 0x8E00: home += 100 # 0x8E00: end of RAM
-home = min(range(min_home, home, 100), key=lambda home:
-	(
-		sum( # count number of ... satisfy condition
-			get_npress_adr(home+home_offset) >= 100
-			for source_adr, home_offset in adr_of_cmds),
-		-home # if ties then take max `home`
-	)
-)
+if home == None:
+    if output_format != 'l':
+        home = 0x8DA4 # initial value of SP before POP PC
+        if home + len(result) > 0x8E00:
+        	sys.stderr.write('Warning: Program longer than 92 bytes (%d bytes)\n'%len(result))
+        if 'home' in labels: home -= labels['home'] # confusing? ...
+    
+        min_home = home
+        while min_home >= 0x8154+200: min_home -= 100
+        while home + len(result) <= 0x8E00: home += 100 # 0x8E00: end of RAM
+        home = min(range(min_home, home, 100), key=lambda home:
+        	(
+        		sum( # count number of ... satisfy condition
+        			get_npress_adr(home+home_offset) >= 100
+        			for source_adr, home_offset in adr_of_cmds),
+        		-home # if ties then take max `home`
+        	)
+        )
+    else:
+        home = 0x85b0 - len(result)
+        entry = home + labels.get('home', 0) - 2
+        result.extend((0x6a, 0x4f, 0, 0, entry & 255, entry >> 8, 0x68, 0x4f, 0, 0))
+        while home + len(result) < 0x85d7:
+            result.append(0)
+        result.extend((0xff, 0xae, 0x85))
+        home2 = 0
+        assert (home - home2) >= 0x8501, 'Program too long'
+        while get_npress_adr(home - home2) >= 100:
+            home2 += 1
 
 # home is picked now, now substitute in the result
 for source_adr, home_offset in adr_of_cmds:
-	target_adr = home + home_offset
-	assert result[source_adr] == 0
-	result[source_adr] = target_adr & 0xFF
-	assert result[source_adr+1] == 0
-	result[source_adr+1] = target_adr >> 8
+    target_adr = home + home_offset
+    assert result[source_adr] == 0
+    result[source_adr] = target_adr & 0xFF
+    assert result[source_adr+1] == 0
+    result[source_adr+1] = target_adr >> 8
 
 # scroll it around (use the most inefficient way)
 hackstring = list(map(ord,'1234567890'*10)) # but still O(n)
@@ -219,6 +243,14 @@ for home_offset, byte in enumerate(result):
 # done
 if output_format == 'h':
 	print(''.join(f'{byte:0{2}x}' for byte in hackstring))
+elif output_format == 'j':
+	print('0x%04x:'%home, *map('%02x'.__mod__, result))
+elif output_format == 'l':
+	print('%s %s:'%(to_key((home - home2) & 255), to_key((home - home2) >> 8)))
+	for i in range(home2):
+            result.insert(0, 0)
+	import keypairs
+	print(keypairs.format(result))
 else:
 	assert output_format == 'k', 'Internal error'
 	print(' '.join(map(to_key, hackstring)))
