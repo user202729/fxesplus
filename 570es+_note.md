@@ -749,39 +749,25 @@ bool f_0B3EC (void):   ; 1-byte bool
 
 ---------------------------------------
 
-f_0B370 (near int8_t* er0 = param0, near int8_t* er2 = param1) {
-	backup er14
-	allocate 2 bytes: (fp - 2 is not used)
-		uint8_t a @ (fp - 1)
-
-	backup xr8, er4
-
-	er10 = param1
-
-	mov r0, 0
-	a = r0
-	bc al, .m1
-
-.l_012:
-	param0[2*a] = int8_t[er10]
-	param0[2*a+1] = int8_t[er10+1]
-	er10 += 16 ; real screen byte width
-	--a
-.m1:
-	l r1, [d_08117] ; probably char height
-	cmp r0, r1
-	bc lt, .l_012
-
-	pop er4
-	pop xr8
-	mov sp, er14
-	pop er14
-	rt
-}
+	// out_adr: er0, in_adr: er2. As usual for functions, only modify r0..r3.
+	f_0B370 (near int8_t* out_adr, near int8_t* in_adr) {
+		allocate 2 bytes: (fp - 2 is not used)
+			uint8_t a @ (fp - 1)
+	
+		er10 = in_adr
+		for(a = 0; a < uint8_t(*d_08117); ++a){
+			// d_08117: probably char height
+			out_adr[2*a] = int8_t[er10]
+			out_adr[2*a+1] = int8_t[er10+1]
+			er10 += 16 ; real screen byte width
+		}
+	}
 
 -----------------------
 
-f_02EBA (uint8_t param1 @ r0, uint8_t chr @ r2) {
+; draw_char?
+
+f_02EBA (uint8_t col@r0, uint8_t row@r1, uint8_t chr@r2) {
 	push lr
 	backup r4 .. r15
 	allocate 21 bytes:
@@ -800,7 +786,7 @@ f_02EBA (uint8_t param1 @ r0, uint8_t chr @ r2) {
 		near ptr screen_pos @ er10
 
 
-	if (r0 > 95u || int8_t(r1) >= 32) goto __return;
+	if (col > 95u || int8_t(row) >= 32) goto __return;
 
 	if (int8_t [d_0811D] == 0) {
 		screen_width = 16
@@ -819,8 +805,8 @@ f_02EBA (uint8_t param1 @ r0, uint8_t chr @ r2) {
 		b2 = 2
 	}
 	if (r3 == 7 && chr < 32) {
-		++ r3  ; suspect font size = 6/7 (7/8) for small font in case of diacritics
-		-- r1
+		++ r3  ; font size = 6/7 (7/8) for small font in case of diacritics
+		-- row
 	}
 	push r3
 	mov er6, er0
@@ -851,7 +837,7 @@ f_02EBA (uint8_t param1 @ r0, uint8_t chr @ r2) {
 			mov er0, screen_pos
 			mov er2, er12
 			push r6
-			bl f_030BE
+			bl draw_byte
 			pop r0
 		} else {
 			l r0, b2
@@ -863,7 +849,7 @@ f_02EBA (uint8_t param1 @ r0, uint8_t chr @ r2) {
 			b4 = r8
 			mov er2, &b4
 			push r7
-			bl f_030BE
+			bl draw_byte
 			pop r0
 			l r0, b2
 			add r0, 1
@@ -873,7 +859,7 @@ f_02EBA (uint8_t param1 @ r0, uint8_t chr @ r2) {
 				st r8, b4
 				mov er2, &b4
 				push r6
-				bl f_030BE
+				bl draw_byte
 				pop r0
 			}
 		}
@@ -895,11 +881,10 @@ f_02EBA (uint8_t param1 @ r0, uint8_t chr @ r2) {
 	pop xr4
 	pop pc
 
-;;; --------------------------------------------------------------
-;;; Probably draw pixel on screen (in different drawing mode)
-;;; --------------------------------------------------------------
 
-void f_030BE (near uint8_t* ptr1 @ er0, near uint8_t* chr @ er2, uint8_t mask @ sp+0) {
+; f_030BE. See funcnames
+
+void draw_byte (near uint8_t* ptr1 @ er0, near uint8_t* chr @ er2, uint8_t mask @ sp+0) {
 	local uint8_t r14 @ l_char, uint8_t r15 @ l_mask
 
 	backup er14

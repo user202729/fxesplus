@@ -1,0 +1,50 @@
+# Functions and data labels. Not include gadgets.
+
+# Arguments are 0-indexing.
+# All lines with '#' won't match the Lua pattern so they're effectively
+# comments. Comment for something is put **after** it.
+
+f_02E78		_1line_print.col_0
+.l_002		._1line_print  # r0: col, r1: row, er2: address
+f_030BE		draw_byte   # take a pointer to a byte on the screen, the bitmask
+				# to draw and the background bitmask. Using draw_mode.
+f_0312C		render      # screen buffer -> screen
+f_0343E		multiline_print
+f_03486		pd_value
+f_044A8		memzero
+f_04598		reset_magic_string
+f_045A6		need_reset	# check magic string and various things
+.l_03C		.yes
+.l_042		.no
+f_045EE		f_045EE
+.l_052		.delay  # 04640
+f_04C30		hex_byte  # r0 -> 2-byte string in er0
+f_04E50		strcpy
+f_07E94		memset
+f_07EF6		memcpy
+f_08B82		strlen
+f_08BA0		strchr
+f_096E8		far_call_stub  # it's likely that the compiler auto generate
+				# this to call far function pointer
+f_096EA		strcat
+f_0AFB0		reset_all
+f_0B370		char_print  # char(*er0) -> real screen at (*er2)
+f_0B45E		getkeycode
+f_1B4EA		invalid_var
+
+# ========= Functions with not enough or unconfirmed information
+
+f_02EBA		draw
+f_0B0C6		keypress_wait
+
+# ========= Data labels (also see the cheat table)
+
+d_0860E		magic_string  # 15 bytes '0f 0e 0d 0c ... 02 01', the calculator
+				# is reset on startup if this is corrupted
+d_0810E		contrast
+d_0811C		draw_mode
+				# 0: white background
+				# 4: white background (sanitize, only draw inside background)
+				# 1: transparent background
+				# 2: AND with screen
+				# 3 (otherwise): xor with screen
