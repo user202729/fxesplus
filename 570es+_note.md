@@ -142,7 +142,7 @@ Result is written to `p0`.
 (some functions are extremely trivial.
 Nevertheless it doesn't cause any harm by keeping them)
 
-## f_03486
+## f\_03486
 
 (read Pd number, store to R0)
 
@@ -197,7 +197,7 @@ Nevertheless it doesn't cause any harm by keeping them)
 	pop qr8
 	pop pc
 
-## f_154F2
+## f\_154F2
 
 Copy function for number. `void(number* x, number* y)`
 `x` is at `er0`, `y` is at `er12`. (`bp`, not `er2`)
@@ -209,7 +209,7 @@ Change no register.
 		*(x+1) = *(y+1);
 
 
-## f_4E50
+## f\_04E50
 
 `strcpy`
 
@@ -218,7 +218,7 @@ When invoked to copy from input to cache (in basic overflow),
 return to 00:28FA [re 2768]; when PC = 4e66, (before 6 register
 pop's), SP = 8D9E.
 
-## f_4C30
+## f\_04C30
 
 Convert hexadecimal number in R0 to ASCII, stored in ER0.
 Used by checksum procedure.
@@ -229,17 +229,17 @@ Used by checksum procedure.
 	if (R0 >= 10) R0 += 0x37; else R0 += 0x48;
 	return ER0;
 
-## f_96EA
+## f\_096EA
 
 `strcat`
 
 Append a null-terminated string to another null-terminated string.
 
-## f_5A4E
+## f\_05A4E
 
 Convert output character to its name.
 
-## f_2b10
+## f\_02B10
 
 Write content (Bin|Oct|Dec|Hex) to screen.
 
@@ -251,11 +251,11 @@ Write content (Bin|Oct|Dec|Hex) to screen.
 	func_300C(); ; take R0, R1, ER2
 	return;
 
-## f_2e7a
+## f\_02E7A
 Write 1 line of contents (pointed to by ER2) to screen at position (x = R0, y = R1)
 If call `f_2e78` then x = 0.
 
-## f_1444C
+## f\_1444C
 
 Note: `(R4 -> R0)` is the concatenated in little-endian of R4 to R0,
 just like `XR0 = (R3 -> R0)`.
@@ -348,7 +348,7 @@ Code:
 	; R0 is 0, but there may be exceptional cases
 	return;
 
-## f_47F2
+## f\_047F2
 
 {RT} Return true if there is a key pressed.
 
@@ -356,14 +356,14 @@ Code:
 	R2 = [0F040h]     // with a delay of 2 clock cycles
 	R0 = (R2 != 0FFh) // if (R2 == 0FFh) R0 = 0; else R0 = 1;
 
-## f_46CC
+## f\_046CC
 
 Return value of bit 080F4h.7. `(void)->er0`.
 
 	if (080F4h.7 == 0) {return 0};
 	return 1;
 
-## f_312C
+## f\_0312C
 
 Copy screen buffer to hardware screen.
 
@@ -385,7 +385,7 @@ Copy screen buffer to hardware screen.
 	} while (R0 != 0);
 	POP ER0
 
-## f_07EF6
+## f\_07EF6
 
 {RT} `memcpy`. (return `dest`)
 
