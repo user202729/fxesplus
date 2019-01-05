@@ -10,6 +10,8 @@ f_030BE		draw_byte   # take a pointer to a byte on the screen, the bitmask
 				# to draw and the background bitmask. Using draw_mode.
 f_0312C		render      # screen buffer -> screen
 f_0343E		multiline_print
+f_0347A		set_up_arrow
+f_03480		set_down_arrow
 f_03486		pd_value
 f_044A8		memzero
 f_04598		reset_magic_string
@@ -27,6 +29,7 @@ f_08BA0		strchr
 f_096E8		far_call_stub  # it's likely that the compiler auto generate
 				# this to call far function pointer
 f_096EA		strcat
+f_0AEFA		table_home		# go to row 1 col 1 of table
 f_0AFB0		reset_all
 f_0B370		char_print  # char(*er0) -> real screen at (*er2)
 f_0B45E		getkeycode
@@ -39,12 +42,225 @@ f_0B0C6		keypress_wait
 
 # ========= Data labels (also see the cheat table)
 
-d_0860E		magic_string  # 15 bytes '0f 0e 0d 0c ... 02 01', the calculator
-				# is reset on startup if this is corrupted
-d_0810E		contrast
+d_00400
+d_00694
+d_00707
+d_00746
+d_00782
+d_007CC
+d_007E6
+d_007FC
+d_0080A
+d_0080B
+d_00812
+d_0081A
+d_0081C
+d_0081D
+d_0081E
+d_0081F
+d_0082C
+d_0082D
+d_0082E
+d_0082F
+d_00844
+d_0084E
+d_00856
+d_0085B
+d_00864
+d_01C64
+d_01C6C
+d_01DB2
+d_01DCE
+d_01DDC
+d_01DE8
+d_01DF4
+d_01DF6
+d_01E24
+d_01E5C
+d_01E86
+d_01E88
+d_01F74
+d_01FB6
+d_01FB8
+d_02399
+d_023C6
+d_023C8
+d_023C9
+d_023D2
+d_023D3
+d_023D4
+d_023D5
+d_08000
+d_08002
+d_08004
+d_08005
+d_08006
+d_08007
+d_08008
+d_08009
+d_0800A
+d_0800B
+d_0800C
+d_0800D
+d_0800E
+d_0800F
+d_08010
+d_08011
+d_08012
+d_08018
+d_08019
+d_0801A
+d_0801C
+d_0801D
+d_0801E
+d_0801F
+d_08020
+d_08022
+d_08029
+d_0802A
+d_0802B
+d_0802C
+d_0802D
+d_0802E
+d_0802F
+d_08030
+d_08032
+d_08039
+d_0803A
+d_0803B
+d_0803C
+d_08044
+d_08046
+d_0804C
+d_08050
+d_08052
+d_08059
+d_0805A
+d_0805B
+d_0805C
+d_0805E
+d_080DC
+d_080DD		cursor_noflash
+d_080DE
+d_080DF
+d_080E0
+d_080E1
+d_080F2
+d_080F4
+d_080F5		last_fn_key  # example: 'sin' = A0, 'sin^-1' = B0
+d_080F7
+d_080F8		modifiers     # 08:shift,04:alpha,02:RCL,01:STO
+d_080F9		mode          # 193:comp,196:cmplx,3:stat,base-n:2,eqn:69,etc.
+d_080FA		submode       # base-n:(base-1),ineq:(degree+1),stat:1~8,etc.
+d_080FB		screen_state  # normal: 0, mode: 1, setup: 2, hyp/deg...: 3
+d_080FC
+d_080FD
+d_080FE
+d_080FF
+d_08100
+d_08101
+d_08102		setup.number_form   # fix/sci/norm
+d_08103
+d_08104
+d_08105		setup.deg_form      # d: 4, r: 5, g: 6
+d_08106		setup.mthio
+d_08107
+d_08108
+d_08109		setup.stat_freq
+d_0810A		setup.rdec
+d_0810C
+d_0810E		setup.contrast
+d_0810F
+d_08110		cursor_pos_byte
+d_08111
+d_08112		lineio_disp
+d_08113
+d_08114		cursor_xcor
+d_08115		cursor_ycor
+d_08116
+d_08117
+d_08118		viewport_table  # 1 or 2 for 4-column tables
+d_08119		row_in_table    # relative to current viewport
+d_0811A		col_in_table
+d_0811B		font_size
 d_0811C		draw_mode
 				# 0: white background
 				# 4: white background (sanitize, only draw inside background)
 				# 1: transparent background
 				# 2: AND with screen
 				# 3 (otherwise): xor with screen
+
+d_0811D		use_buffer   # real screen or screen buffer
+d_08120
+d_08122
+d_08123		use_output_charset
+				# example: 0x4E is '×' input but 'N' output
+d_08124
+d_08125
+d_08126
+d_08128		formula_ptr   # usually 0x8154
+d_0812A
+d_0812C
+d_08224		timer         # 2-byte value. Used in the RNG.
+
+# ====== Those addresses are not referenced directly in the disassembly
+d_08226		var_m
+d_08230		var_ans
+d_0823A		var_a
+d_08244		var_b
+	# ... until ...
+d_08280		var_y
+# ======
+
+d_083FC
+d_083FD
+d_083FE
+
+d_0860E		magic_string  # 15 bytes '0f 0e 0d 0c ... 02 01', the calculator
+				# is reset on startup if this is corrupted
+
+d_087D0		screen_buffer
+d_087D1 	screen_buffer.1
+d_087D2 	screen_buffer.2
+d_087D3 	screen_buffer.3
+d_087D4 	screen_buffer.4
+d_087D5 	screen_buffer.5
+d_087D7 	screen_buffer.7
+d_087D8 	screen_buffer.8
+d_087D9 	screen_buffer.9
+d_087DA 	screen_buffer.A
+d_087DB 	screen_buffer.B
+d_08DEA
+
+d_0F000		hardware.dsr
+d_0F008
+d_0F00A
+d_0F010
+d_0F014
+d_0F018
+d_0F020		timer.interval
+d_0F022		timer.counter
+d_0F024
+d_0F025		timer.control
+d_0F030
+d_0F031
+d_0F032		screen.contrast
+d_0F033
+d_0F034
+d_0F040		keyboard.ki
+d_0F041
+d_0F042		keyboard.ki_filter
+d_0F044		keyboard.ko_mask
+d_0F045
+d_0F046		keyboard.ko
+d_0F047
+d_0F048
+d_0F049
+d_0F221
+d_0F222
+d_0F223
+d_0F800		screen.disp
+d_0F801		screen.disp.1
+d_0F802		screen.disp.2
+d_0F80A		screen.disp.A
+d_0F80B		screen.disp.B
