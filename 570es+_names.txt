@@ -35,6 +35,78 @@ f_0B370		char_print  # char(*er0) -> real screen at (*er2)
 f_0B45E		getkeycode
 f_1B4EA		invalid_var
 
+# ==== Functions that manipulate calculator-level numbers (10 bytes each)
+
+# 14796						# 00
+f_130B2		num_stat_P      # 01
+f_13152		num_stat_Q      # 02
+f_1316C		num_stat_R      # 03
+f_1373C		mat_det         # 03
+f_13404		mat_plus        # 09
+f_134BE		mat_minus       # 0a
+f_134C6		mat_mul_num     # 0b
+f_13532		mat_div         # 0c
+f_135DE		mat_mul         # 0f
+f_1A716		num_abs         # 08
+f_1483C		num_rnd         # 09
+f_1A88E		num_sinh        # 0c
+f_1A87C		num_cosh        # 0d
+f_1A86A		num_tanh        # 0e
+f_1A858		num_asinh       # 0f
+f_1A846		num_acosh       # 10
+f_1A834		num_atanh       # 11
+f_1A632		num_exp         # 12
+f_1A61E		num_10xp        # 13
+f_1AADC		num_sqrt        # 14
+f_1A646		num_ln          # 15
+f_1ABCC		num_cbrt        # 16
+f_14DE6		num_sin         # 17
+f_14DF0		num_cos         # 18
+f_14E86		num_tan         # 19
+f_1A8C4		num_asin        # 1a
+f_1A8B2		num_acos        # 1b
+f_1A8A0		num_atan        # 1c
+f_1A65A		num_log10       # 1d
+f_1A4EE		num_log         # 20
+f_14CD8		num_pol         # 21
+				# store first value to result, second value to somewhere else
+f_14CE0		num_rec         # 22
+f_14AB2		num_plus        # 28
+f_14ABE		num_minus       # 29
+f_14ACA		num_mul         # 2a
+f_14AD6		num_div         # 2b
+f_1A516		num_permu       # 2e
+f_1A502		num_combi       # 2f
+f_1B1B8		num_negate      # 34
+f_14BD6		num_frac        # 39
+				# When the denominator is 0 it does not return error
+				# (f3). Instead it does not change r0. Binary.
+				# This can be used as ternary function
+				# (mixed fraction) with 2 param = num & denom. Where
+				# is integral part?
+f_14A7E		num_cmplx_pow   # 3a
+f_111E0		num_nthroot     # 3b
+f_13190		num_stat_to_t   # 3d
+f_16D8E		num_inverse     # 40
+f_16D6C		num_square      # 41
+f_16D30		num_cube        # 42
+f_14D00		num_percent     # 43
+f_1A5A6		num_factorial   # 44
+f_14D12		num_deg         # 45
+f_14D16		num_rad         # 46
+f_14D1A		num_grad        # 47
+f_1AE26		cmplx_abs       # 48
+f_14B1C		cmplx_plus      # 4b
+f_14B30		cmplx_minus     # 4c
+f_14B44		cmplx_mul       # 4d
+f_14BA8		cmplx_div       # 4e
+f_148CC		cmplx_negate    # 4f
+f_14B08		cmplx_inverse   # 50
+f_1717C		cmplx_square    # 51
+f_17150		cmplx_cube      # 52
+f_1333A		num_randint     # 54
+
+
 # ========= Functions with not enough or unconfirmed information
 
 f_02EBA		draw
