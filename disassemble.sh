@@ -1,4 +1,5 @@
 #!/bin/sh
+cd "$(dirname $0)"
 lua CasioEmu/disassembler/disassembler.lua \
 	input='CasioEmu/models/fx570esplus/rom.bin' \
 	output='./fx_570es+_disas.txt' \
