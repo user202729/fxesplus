@@ -15,7 +15,7 @@ f_03480		set_down_arrow
 f_03486		pd_value
 f_044A8		memzero
 f_04598		reset_magic_string
-f_045A6		need_reset	# check magic string and various things
+f_045A6		need_reset  # check magic string and various things
 .l_03C		.yes
 .l_042		.no
 f_045EE		f_045EE
@@ -29,7 +29,7 @@ f_08BA0		strchr
 f_096E8		far_call_stub  # it's likely that the compiler auto generate
 				# this to call far function pointer
 f_096EA		strcat
-f_0AEFA		table_home		# go to row 1 col 1 of table
+f_0AEFA		table_home  # go to row 1 col 1 of table
 f_0AFB0		reset_all
 f_0B370		char_print  # char(*er0) -> real screen at (*er2)
 f_0B45E		getkeycode
@@ -37,7 +37,7 @@ f_1B4EA		invalid_var
 
 # ==== Functions that manipulate calculator-level numbers (10 bytes each)
 
-# 14796						# 00
+# 14796		                # 00
 f_130B2		num_stat_P      # 01
 f_13152		num_stat_Q      # 02
 f_1316C		num_stat_R      # 03
@@ -209,8 +209,8 @@ d_08052
 d_08059
 d_0805A
 d_0805B
-d_0805C
-d_0805E
+d_0805C		num_arg1     # functions that manipulate numbers (such as
+d_0805E		num_arg2     # num_plus) save the arguments here
 d_080DC
 d_080DD		cursor_noflash
 d_080DE
