@@ -3,12 +3,19 @@
 # Arguments are 0-indexing.
 # All lines with '#' won't match the Lua pattern so they're effectively
 # comments. Comment for something is put **after** it.
+# Functions with trailing `__` are uncertain.
 
-f_02E78		_1line_print.col_0
-.l_002		._1line_print  # r0: col, r1: row, er2: address
-f_030BE		draw_byte   # take a pointer to a byte on the screen, the bitmask
+f_02750		strlen_null      # strlen, but treat NULL as ""
+f_0275A		strcpy_null
+.l_014		.strcat_null      # delete target if try to cat NULL
+
+f_02CE0		buffer_clear_lastnline
+f_02EBA		char_print       # r0: col, r1: row, r2: char
+f_02E78		line_print.col_0
+.l_002		.line_print      # r0: col, r1: row, er2: address
+f_030BE		draw_byte        # take a pointer to a byte on the screen, the bitmask
 				# to draw and the background bitmask. Using draw_mode.
-f_0312C		render      # screen buffer -> screen
+f_0312C		render           # copy screen buffer -> screen
 f_0343E		multiline_print
 f_0347A		set_up_arrow
 f_03480		set_down_arrow
@@ -31,7 +38,8 @@ f_096E8		far_call_stub  # it's likely that the compiler auto generate
 f_096EA		strcat
 f_0AEFA		table_home  # go to row 1 col 1 of table
 f_0AFB0		reset_all
-f_0B370		char_print  # char(*er0) -> real screen at (*er2)
+f_0B0C6		keypress_wait__
+f_0B370		char_print_real_screen__  # char(*er0) -> real screen at (*er2)
 f_0B45E		getkeycode
 f_1B4EA		invalid_var
 
@@ -106,11 +114,45 @@ f_1717C		cmplx_square    # 51
 f_17150		cmplx_cube      # 52
 f_1333A		num_randint     # 54
 
+# ========= Other functions
 
-# ========= Functions with not enough or unconfirmed information
+f_085EC		num_to_str      # char num_to_str(num const*, char*)
+f_1B474		f_1B474
+.l_016		.num_cpy
 
-f_02EBA		draw
-f_0B0C6		keypress_wait
+# Arithmetic functions on num call this function and f_14A00.
+# It's not clear what f_14A00 does, but it does not affect the
+# calculated result.
+
+f_1A9EC		num_minus_1
+.l_014		.num_plus_1
+.l_03C		.num_mul_1
+f_132EC
+f_19F28		mv_reg_arg01
+.l_008		mv_reg0_arg0
+.l_028		.mv_reg1_arg1
+# Note that regs are stored in shuffled order -- if num is [0123456789],
+# reg is [8976543210]
+
+f_178F2		mv_reg0_reg1
+f_17928		mv_reg0_reg2
+f_17862		mv_reg0_reg3
+f_17916		mv_reg0_reg5
+f_178E0		mv_reg1_reg0
+f_178BC		mv_reg1_reg2
+f_17874		mv_reg1_reg3
+f_1782C		mv_reg1_reg4
+f_17898		mv_reg1_reg5
+f_178CE		mv_reg2_reg0
+f_1793A		mv_reg2_reg1
+f_17886		mv_reg3_reg0
+f_17850		mv_reg4_reg0
+f_1783E		mv_reg4_reg1
+f_178AA		mv_reg5_reg0
+f_17904		mv_reg5_reg1
+
+f_132EC		num_normalize     # set 2 last bytes to '99 00' <-> multiply by a
+				# power of 10 to make it a value to a number in [0.1, 1[
 
 # ========= Data labels (also see the cheat table)
 
@@ -162,25 +204,25 @@ d_023D2
 d_023D3
 d_023D4
 d_023D5
-d_08000
-d_08002
-d_08004
-d_08005
-d_08006
-d_08007
-d_08008
-d_08009
+d_08000		reg0
+d_08002		reg0.2
+d_08004		reg0.4
+d_08005		reg0.5
+d_08006		reg0.6
+d_08007		reg0.7
+d_08008		reg0.8
+d_08009		reg0.9
 d_0800A
 d_0800B
 d_0800C
 d_0800D
 d_0800E
 d_0800F
-d_08010
-d_08011
-d_08012
-d_08018
-d_08019
+d_08010		reg1
+d_08011		reg1.1
+d_08012		reg1.2
+d_08018		reg1.8
+d_08019		reg1.9
 d_0801A
 d_0801C
 d_0801D
@@ -195,22 +237,22 @@ d_0802C
 d_0802D
 d_0802E
 d_0802F
-d_08030
-d_08032
-d_08039
+d_08030		reg2
+d_08032		reg2.2
+d_08039		reg2.9
 d_0803A
 d_0803B
-d_0803C
-d_08044
-d_08046
-d_0804C
-d_08050
-d_08052
-d_08059
+d_0803C		reg3
+d_08044		reg3.8
+d_08046		reg4
+d_0804C		reg4.6
+d_08050		reg5
+d_08052		reg5.2
+d_08059		reg5.9
 d_0805A
 d_0805B
-d_0805C		num_arg1     # functions that manipulate numbers (such as
-d_0805E		num_arg2     # num_plus) save the arguments here
+d_0805C		arg0_ref      # functions that manipulate numbers (such as
+d_0805E		arg1_ref      # num_plus) save the arguments reference here
 d_080DC
 d_080DD		cursor_noflash
 d_080DE
@@ -273,7 +315,8 @@ d_08126
 d_08128		formula_ptr   # usually 0x8154
 d_0812A
 d_0812C
-d_08224		timer         # 2-byte value. Used in the RNG.
+d_0821C		random_state  # Used in the random generator.
+d_08224		timer         # 2-byte value. Part of the random state.
 
 # ====== Those addresses are not referenced directly in the disassembly
 d_08226		var_m
