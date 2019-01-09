@@ -36,8 +36,15 @@ def add_command(command_dict, address, command, tags, debug_info=''):
 		f'Command ends with ":" {debug_info}'
 	assert ';' not in command, \
 		f'Command contains ";" {debug_info}'
-	assert command not in command_dict, f'Command {command} appears twice - ' \
-		f'first: {command_dict[command][0]:05X} {command_dict[command][1]}, ' \
+
+	# this is inefficient
+	prev_command = command_dict.get(command, None)
+	for adr, tags in command_dict.values():
+		if adr == address:
+			prev_command = (adr, tags)
+			break
+	assert prev_command is None, f'Command {command} appears twice - ' \
+		f'first: {prev_command[0]:05X} {prev_command[1]}, ' \
 		f'second: {address:05X} {tags},' \
 
 	command_dict[command] = (address, tuple(tags))
@@ -57,6 +64,7 @@ def get_commands(filename, commands=None):
 
 	if commands is None: commands = {}
 	in_comment = False
+	line_regex = re.compile('([0-9a-fA-F]+)\s+(.+)')
 	for line_index, line in enumerate(data):
 		line = line.strip()
 
@@ -73,11 +81,8 @@ def get_commands(filename, commands=None):
 		line = del_inline_comment(line)
 		if not line: continue
 
-		try:
-			address, command = line.split('\t')
-		except ValueError:
-			raise Exception(f'Line {line_index} '
-				'has an unexpected number of tab characters')
+		match = line_regex.fullmatch(line)
+		address, command = match[1], match[2]
 
 		command = canonicalize(command)
 
@@ -186,8 +191,10 @@ def get_commands_from_rename_list(filename, commands=None):
 					tags = tags + ('del lr',)
 
 			if real in commands:
-				if ('override rename list' in commands[real][1] or
-						commands[real] == (addr, tags)):
+				if 'override rename list' in commands[real][1]:
+					continue
+				if commands[real] == (addr, tags):
+					sys.stderr.write(f'Warning: Duplicated command {real}\n')
 					continue
 
 			add_command(commands, addr, real, tags=tags, debug_info=f'at {filename}:{line_index}')
@@ -242,7 +249,10 @@ while program:
 		try:
 			adr = int(line[4:], 16)
 		except ValueError:
-			adr = commands[line[4:].strip()][0]
+			adr, tags = commands[line[4:].strip()]
+			for tag in tags:
+				if tag.startswith('warning'):
+					sys.stderr.write(tag+'\n')
 
 		assert 0 <= adr < 0x20000, f'Invalid address: {line}'
 		adr = optimize_adr_for_npress(adr)
