@@ -142,6 +142,13 @@ Result is written to `p0`.
 (some functions are extremely trivial.
 Nevertheless it doesn't cause any harm by keeping them)
 
+## f\_02C04 (`num_output_print`)
+
+Prototype: `void(num*)`.
+
+Allocate 26 bytes for the number string representation (including null byte)
+Compute the x-coordinate to draw as `96-6*len`.
+
 ## f\_03486
 
 (read Pd number, store to R0)

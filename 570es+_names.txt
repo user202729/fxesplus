@@ -5,154 +5,209 @@
 # comments. Comment for something is put **after** it.
 # Functions with trailing `__` are uncertain.
 
-f_02750		strlen_null      # strlen, but treat NULL as ""
-f_0275A		strcpy_null
-.l_014		.strcat_null      # delete target if try to cat NULL
+02750		strlen_null      # strlen, but treat NULL as ""
+0275A		strcpy_null
+0276E		strcat_null      # delete target if try to cat NULL
 
-f_02CE0		buffer_clear_lastnline
-f_02EBA		char_print       # r0: col, r1: row, r2: char
-f_02E78		line_print.col_0
-.l_002		.line_print      # r0: col, r1: row, er2: address
-f_030BE		draw_byte        # take a pointer to a byte on the screen, the bitmask
+02B10		basen_base_print
+02C04		num_output_print # takes num*, if == NULL then print ''
+02CE0		buffer_clear_lastnline
+02EBA		char_print       # r0: col, r1: row, r2: char
+02E78		line_print.col_0
+02E7A		line_print       # r0: col, r1: row, er2: address
+030BE		draw_byte        # take a pointer to a byte on the screen, the bitmask
 				# to draw and the background bitmask. Using draw_mode.
-f_0312C		render           # copy screen buffer -> screen
-f_0343E		multiline_print
-f_0347A		set_up_arrow
-f_03480		set_down_arrow
-f_03486		pd_value
-f_044A8		memzero
-f_04598		reset_magic_string
-f_045A6		need_reset  # check magic string and various things
+0312C		render           # copy screen buffer -> screen
+#0343E		multiline_print
+0347A		set_up_arrow
+03480		set_down_arrow
+03486		pd_value
+044A8		memzero
+04598		reset_magic_string
+045A6		need_reset  # check magic string and various things
 .l_03C		.yes
 .l_042		.no
-f_045EE		f_045EE
-.l_052		.delay  # 04640
-f_04C30		hex_byte  # r0 -> 2-byte string in er0
-f_04E50		strcpy
-f_07E94		memset
-f_07EF6		memcpy
-f_08B82		strlen
-f_08BA0		strchr
-f_096E8		far_call_stub  # it's likely that the compiler auto generate
+04640		delay       # 04640
+04C30		hex_byte    # r0 -> 2-byte string in er0
+04E50		strcpy
+07E94		memset
+07EF6		memcpy
+08B82		strlen
+08BA0		strchr
+096E8		far_call_stub  # it's likely that the compiler auto generate
 				# this to call far function pointer
-f_096EA		strcat
-f_0AEFA		table_home  # go to row 1 col 1 of table
-f_0AFB0		reset_all
-f_0B0C6		keypress_wait__
-f_0B370		char_print_real_screen__  # char(*er0) -> real screen at (*er2)
-f_0B45E		getkeycode
-f_1B4EA		invalid_var
+096EA		strcat
+0AEFA		table_home  # go to row 1 col 1 of table
+0AFB0		reset_all
+0B0C6		keypress_wait__
+0B370		char_print_real_screen__  # char(*er0) -> real screen at (*er2)
+0B45E		getkeycode
+1B4EA		invalid_var
 
 # ==== Functions that manipulate calculator-level numbers (10 bytes each)
 
 # 14796		                # 00
-f_130B2		num_stat_P      # 01
-f_13152		num_stat_Q      # 02
-f_1316C		num_stat_R      # 03
-f_1373C		mat_det         # 03
-f_13404		mat_plus        # 09
-f_134BE		mat_minus       # 0a
-f_134C6		mat_mul_num     # 0b
-f_13532		mat_div         # 0c
-f_135DE		mat_mul         # 0f
-f_1A716		num_abs         # 08
-f_1483C		num_rnd         # 09
-f_1A88E		num_sinh        # 0c
-f_1A87C		num_cosh        # 0d
-f_1A86A		num_tanh        # 0e
-f_1A858		num_asinh       # 0f
-f_1A846		num_acosh       # 10
-f_1A834		num_atanh       # 11
-f_1A632		num_exp         # 12
-f_1A61E		num_10xp        # 13
-f_1AADC		num_sqrt        # 14
-f_1A646		num_ln          # 15
-f_1ABCC		num_cbrt        # 16
-f_14DE6		num_sin         # 17
-f_14DF0		num_cos         # 18
-f_14E86		num_tan         # 19
-f_1A8C4		num_asin        # 1a
-f_1A8B2		num_acos        # 1b
-f_1A8A0		num_atan        # 1c
-f_1A65A		num_log10       # 1d
-f_1A4EE		num_log         # 20
-f_14CD8		num_pol         # 21
+130B2		num_stat_P      # 01
+13152		num_stat_Q      # 02
+1316C		num_stat_R      # 03
+1373C		mat_det         # 03
+13404		mat_add         # 09
+134BE		mat_sub         # 0a
+134C6		mat_mul_num     # 0b
+13532		mat_div         # 0c
+135DE		mat_mul         # 0f
+1A716		num_abs         # 08
+1483C		num_rnd         # 09
+1A88E		num_sinh        # 0c
+1A87C		num_cosh        # 0d
+1A86A		num_tanh        # 0e
+1A858		num_asinh       # 0f
+1A846		num_acosh       # 10
+1A834		num_atanh       # 11
+1A632		num_exp         # 12
+1A61E		num_10xp        # 13
+1AADC		num_sqrt        # 14
+1A646		num_ln          # 15
+1ABCC		num_cbrt        # 16
+14DE6		num_sin         # 17
+14DF0		num_cos         # 18
+14E86		num_tan         # 19
+1A8C4		num_asin        # 1a
+1A8B2		num_acos        # 1b
+1A8A0		num_atan        # 1c
+1A65A		num_log10       # 1d
+1A4EE		num_log         # 20
+14CD8		num_pol         # 21
 				# store first value to result, second value to somewhere else
-f_14CE0		num_rec         # 22
-f_14AB2		num_plus        # 28
-f_14ABE		num_minus       # 29
-f_14ACA		num_mul         # 2a
-f_14AD6		num_div         # 2b
-f_1A516		num_permu       # 2e
-f_1A502		num_combi       # 2f
-f_1B1B8		num_negate      # 34
-f_14BD6		num_frac        # 39
+14CE0		num_rec         # 22
+14AB2		num_add         # 28
+14ABE		num_sub         # 29
+14ACA		num_mul         # 2a
+14AD6		num_div         # 2b
+1A516		num_permu       # 2e
+1A502		num_combi       # 2f
+1B1B8		num_negate      # 34
+14BD6		num_frac        # 39
 				# When the denominator is 0 it does not return error
 				# (f3). Instead it does not change r0. Binary.
 				# This can be used as ternary function
 				# (mixed fraction) with 2 param = num & denom. Where
 				# is integral part?
-f_14A7E		num_cmplx_pow   # 3a
-f_111E0		num_nthroot     # 3b
-f_13190		num_stat_to_t   # 3d
-f_16D8E		num_inverse     # 40
-f_16D6C		num_square      # 41
-f_16D30		num_cube        # 42
-f_14D00		num_percent     # 43
-f_1A5A6		num_factorial   # 44
-f_14D12		num_deg         # 45
-f_14D16		num_rad         # 46
-f_14D1A		num_grad        # 47
-f_1AE26		cmplx_abs       # 48
-f_14B1C		cmplx_plus      # 4b
-f_14B30		cmplx_minus     # 4c
-f_14B44		cmplx_mul       # 4d
-f_14BA8		cmplx_div       # 4e
-f_148CC		cmplx_negate    # 4f
-f_14B08		cmplx_inverse   # 50
-f_1717C		cmplx_square    # 51
-f_17150		cmplx_cube      # 52
-f_1333A		num_randint     # 54
+14A7E		num_cmplx_pow   # 3a
+111E0		num_nthroot     # 3b
+13190		num_stat_to_t   # 3d
+16D8E		num_inverse     # 40
+16D6C		num_square      # 41
+16D30		num_cube        # 42
+14D00		num_percent     # 43
+1A5A6		num_factorial   # 44
+14D12		num_deg         # 45
+14D16		num_rad         # 46
+14D1A		num_grad        # 47
+1AE26		cmplx_abs       # 48
+14B1C		cmplx_add       # 4b
+14B30		cmplx_sub       # 4c
+14B44		cmplx_mul       # 4d
+14BA8		cmplx_div       # 4e
+148CC		cmplx_negate    # 4f
+14B08		cmplx_inverse   # 50
+1717C		cmplx_square    # 51
+17150		cmplx_cube      # 52
+1333A		num_randint     # 54
 
 # ========= Other functions
 
-f_085EC		num_to_str      # char num_to_str(num const*, char*)
-f_1B474		f_1B474
-.l_016		.num_cpy
+085EC		num_to_str      # char num_to_str(num const*, char*)
+1B48A		num_cpy
 
 # Arithmetic functions on num call this function and f_14A00.
 # It's not clear what f_14A00 does, but it does not affect the
 # calculated result.
 
-f_1A9EC		num_minus_1
-.l_014		.num_plus_1
-.l_03C		.num_mul_1
-f_132EC
-f_19F28		mv_reg_arg01
-.l_008		mv_reg0_arg0
-.l_028		.mv_reg1_arg1
+1A9EC		num_sub_1
+1AA00		num_add_1
+1AA28		num_mul_1
+1AA14		num_div_1
+16EA2		cmplx_square_1  # have er2 == er0 when calling
+
+19F28		l_regs          # Load register from argument
+19F30		l_reg0
+19F50		l_reg1
 # Note that regs are stored in shuffled order -- if num is [0123456789],
 # reg is [8976543210]
 
-f_178F2		mv_reg0_reg1
-f_17928		mv_reg0_reg2
-f_17862		mv_reg0_reg3
-f_17916		mv_reg0_reg5
-f_178E0		mv_reg1_reg0
-f_178BC		mv_reg1_reg2
-f_17874		mv_reg1_reg3
-f_1782C		mv_reg1_reg4
-f_17898		mv_reg1_reg5
-f_178CE		mv_reg2_reg0
-f_1793A		mv_reg2_reg1
-f_17886		mv_reg3_reg0
-f_17850		mv_reg4_reg0
-f_1783E		mv_reg4_reg1
-f_178AA		mv_reg5_reg0
-f_17904		mv_reg5_reg1
+19F5E		st_reg0	        # Store register to argument
+19F84		st_reg1
 
-f_132EC		num_normalize     # set 2 last bytes to '99 00' <-> multiply by a
+18FA2		invalid_reg1	# first digit (last in reg order) >= 10
+18FAA		invalid_reg0
+
+178F2		mv_reg0_reg1
+17928		mv_reg0_reg3
+17862		mv_reg0_reg4
+17916		mv_reg0_reg6
+178E0		mv_reg1_reg0
+178BC		mv_reg1_reg3
+17874		mv_reg1_reg4
+1782C		mv_reg1_reg5
+17898		mv_reg1_reg6
+178CE		mv_reg3_reg0
+1793A		mv_reg3_reg1
+17886		mv_reg4_reg0
+17850		mv_reg5_reg0
+1783E		mv_reg5_reg1
+178AA		mv_reg6_reg0
+17904		mv_reg6_reg1
+
+13234		num_random        # 'Ran#'
+132DC		mv_i4_1d10       # Used when value of num [er4] is detected as invalid.
+
+132EC		num_normalize     # set 2 last bytes to '99 00' <-> multiply by a
 				# power of 10 to make it a value to a number in [0.1, 1[
+
+1743C		num_compute_header__
+.l_04C		.ret_04
+.l_04E		.ret
+.l_050		.ret_01
+.l_054		.ret_02
+.l_058		.ret_f0
+173C0		set_reg1_10
+173D6		set_reg1_100d9    # 100/9 = 11.1111...
+173F0		set_reg1_1d10     # 1/10 = 0.1
+1740A		set_reg1_200
+17424		set_reg1_180
+
+1B388		num_trunc__      # may be floor. Used by num_random.
+1B296		num_mulxp__       # num [er0] *= 10 ^ er2
+
+133E6		mv_n8_n4          # mv_nx_ny: numcpy(num [ERx] <- num [ERy])
+133EA		mv_n0_n4
+133EE		mv_n10_n4
+133F2		mv_n10_n2
+133F4		mv_n0_n2
+
+1B0F6		num_fromdigit     # num [er0] = r2, with 0 <= r2 < 10
+				# ('00 00 .. 00' for 0, '0x 00 .. 00 01' for nonzero)
+1B3D4		num_frombyte      # num [er0] = r2
+
+133FA		num_invalid_zf__  # call below and do a cmp with 1
+1B03E		num_invalid__     # == 1 <-> invalid
+
+133E2		num_mul_2__
+
+04D64		num_unk_1__       # used by random function.
+1A7FE		num_unk_1_1__
+17F5E		num_unk_1_r__     # _r functions operate on the registers.
+04DE0		num_unk_2__
+1B430		num_id_1__
+
+17D56		num_arith_r       # reg0 = reg0 (arith_op) reg1
+19C0E		num_div_r
+19D58		num_mul_r
+1A044		num_sub_r
+1A072		num_add_r
+1A0BA		num_add1_r__
+1A092		num_sub1_r__
 
 # ========= Data labels (also see the cheat table)
 
@@ -226,33 +281,33 @@ d_08019		reg1.9
 d_0801A
 d_0801C
 d_0801D
-d_0801E
+d_0801E		arith_op       # (-, +, ÷, ×) = 9, 8, 7, 6
 d_0801F
-d_08020
-d_08022
-d_08029
+d_08020		reg2
+d_08022		reg2.2
+d_08029		reg2.9
 d_0802A
 d_0802B
 d_0802C
 d_0802D
 d_0802E
 d_0802F
-d_08030		reg2
-d_08032		reg2.2
-d_08039		reg2.9
+d_08030		reg3
+d_08032		reg3.2
+d_08039		reg3.9
 d_0803A
 d_0803B
-d_0803C		reg3
-d_08044		reg3.8
-d_08046		reg4
-d_0804C		reg4.6
-d_08050		reg5
-d_08052		reg5.2
-d_08059		reg5.9
+d_0803C		reg4
+d_08044		reg4.8
+d_08046		reg5
+d_0804C		reg5.6
+d_08050		reg6
+d_08052		reg6.2
+d_08059		reg6.9
 d_0805A
 d_0805B
 d_0805C		arg0_ref      # functions that manipulate numbers (such as
-d_0805E		arg1_ref      # num_plus) save the arguments reference here
+d_0805E		arg1_ref      # num_add) save the arguments reference here
 d_080DC
 d_080DD		cursor_noflash
 d_080DE
@@ -264,7 +319,10 @@ d_080F4
 d_080F5		last_fn_key  # example: 'sin' = A0, 'sin^-1' = B0
 d_080F7
 d_080F8		modifiers     # 08:shift,04:alpha,02:RCL,01:STO
-d_080F9		mode          # 193:comp,196:cmplx,3:stat,base-n:2,eqn:69,etc.
+d_080F9		mode
+				# comp 193, cmplx 196, stat 3, basen 2, eqn 69, mat 6,
+				# table 136, vct 7, ratio 74, ineq 75, dist 12
+
 d_080FA		submode       # base-n:(base-1),ineq:(degree+1),stat:1~8,etc.
 d_080FB		screen_state  # normal: 0, mode: 1, setup: 2, hyp/deg...: 3
 d_080FC
