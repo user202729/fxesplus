@@ -16,13 +16,24 @@ Spaces between non-alphanumeric characters are insignificant.
 Leading/trailing spaces are insignificant.
 Case-insensitive.
 
-{curly brackets} at the begin of description are meta-tags.
+{curly brackets} at the begin of description are meta-tags. Case insensitive.
+
+Allowed tags:
+
+* `{set lr}`: Jumping to this function sets the value of LR (and LCSR)
+   to an instruction that pops PC, or have similar behavior.
+* `{del lr}`: Reverse of {set lr}.
+* `{rt}`: This function ends with a RT (or have similar behavior),
+   in order to properly control the PC after jumping to this,
+   it's necessary for LR to have specific values.
+* `{override rename list}`: Override the auto-detected information in `570es+_names.txt`.
+
 */
 
 #adr	description
 #----------------------
 
-2760	{Set LR} strcpy
+2760	{Set LR} {Override rename list} strcpy_null
 276A	[ER0] = R2
 29a8	pop xr12
 2aae	{RT} r0 >>= 4

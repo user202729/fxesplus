@@ -5,4 +5,5 @@ if [ ! -f CasioEmu/models/fx570esplus/rom.bin ]; then
 fi
 CasioEmu/emulator/bin/casioemu \
 	model=CasioEmu/models/fx570esplus/ \
-	script=CasioEmu/emulator/lua-common.lua
+	script=CasioEmu/emulator/lua-common.lua \
+	"$@"

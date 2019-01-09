@@ -24,13 +24,38 @@ def canonicalize(st):
 def del_inline_comment(line):
 	return (line+'#')[:line.find('#')].rstrip()
 
-def get_commands(filename):
-	commands = {}
+def add_command(command_dict, address, command, tags, debug_info=''):
+	''' Add a command to command_dict. '''
+	assert command, f'Empty command {debug_info}'
+	assert type(command_dict) is dict
 
-	file = open(filename, 'r')
-	data = file.read().split('\n')
-	file.close()
+	for disallowed_prefix in '0x', 'call', 'goto', 'adr_of':
+		assert not command.startswith(disallowed_prefix), \
+		f'Command ends with "{disallowed_prefix}" {debug_info}'
+	assert not command.endswith(':'), \
+		f'Command ends with ":" {debug_info}'
+	assert ';' not in command, \
+		f'Command contains ";" {debug_info}'
+	assert command not in command_dict, f'Command {command} appears twice - ' \
+		f'first: {command_dict[command][0]:05X} {command_dict[command][1]}, ' \
+		f'second: {address:05X} {tags},' \
 
+	command_dict[command] = (address, tuple(tags))
+
+
+def get_commands(filename, commands=None):
+	''' Read a list of gadget names.
+
+	Args:
+		commands: A dict to append result to. Not passing any creates a new dict.
+
+	Return:
+		A dict of {name: (address, tags)}
+	'''
+	with open(filename, 'r') as f:
+		data = f.read().splitlines()
+
+	if commands is None: commands = {}
 	in_comment = False
 	for line_index, line in enumerate(data):
 		line = line.strip()
@@ -65,22 +90,115 @@ def get_commands(filename):
 			tags.append(command[1:i])
 			command = command[i+1:]
 
-		assert command, f'Line {line_index} has empty command'
+		try:
+			address = int(address, 16)
+		except ValueError:
+			raise Exception(f'Line {line_index} has invalid address: {address!r}')
 
-		for disallowed_prefix in '0x', 'call', 'goto', 'adr_of':
-			assert not command.startswith(disallowed_prefix), \
-			f'Command ends with "{disallowed_prefix}" in line {line_index}'
-		assert not command.endswith(':'), \
-			f'Command ends with ":" in line {line_index}'
-		assert ';' not in command, \
-			f'Command contains ";" in line {line_index}'
-		assert command not in commands, f'Command f{command} '\
-			f'appears twice - second occurence on line {line_index}'
-
-		commands[command] = (int(address, 16), tuple(tags))
+		add_command(commands, address, command, tags, f'at {filename}:{line_index}')
 
 	return commands
-commands = get_commands('builtins')
+
+def get_disassembly(filename):
+	'''Try to parse a disassembly file with annotated address.
+
+	Each line should look like this:
+
+		mov r2, 1                      ; 0A0A2 | 0201
+
+	Return:
+		A list of strings.
+	'''
+	with open(filename, 'r') as f:
+		data = f.read().splitlines()
+
+	line_regex = re.compile(r'\t(.*?)\s*; ([0-9a-fA-F]*) \|')
+	disasm = []
+	for line in data:
+		match = line_regex.match(line)  # match prefix
+		if match:
+			addr = int(match[2], 16)
+			while addr >= len(disasm): disasm.append('')
+			disasm[addr] = match[1]
+	return disasm
+disasm = get_disassembly('fx_570es+_disas.txt')
+
+def get_commands_from_rename_list(filename, commands=None):
+	'''Try to parse a rename list.
+
+	If the rename list is ambiguous without disassembly, it raises an error.
+
+	Args:
+		commands: A dict to append result to. Not passing any creates a new dict.
+
+	Return:
+		A dict of {name: (address, tags)}
+	'''
+	with open(filename, 'r') as f:
+		data = f.read().splitlines()
+
+	if commands is None: commands = {}
+	line_regex   = re.compile(r'^\s*([\w_.]+)\s*([\w_.]+)')
+	global_regex = re.compile(r'f_([0-9a-fA-F]+)')
+	local_regex  = re.compile(r'.l_([0-9a-fA-F]+)')
+	data_regex   = re.compile(r'd_([0-9a-fA-F]+)')
+	hexadecimal  = re.compile(r'[0-9a-fA-F]+')
+
+	last_global_label = None
+	for line_index, line in enumerate(data):
+		match = line_regex.match(line)
+		if not match: continue
+		raw, real = match[1], match[2]
+		if real.startswith('.') or data_regex.fullmatch(raw):
+			# we only get commands (functions), not local labels or data labels.
+			continue
+
+		addr = None
+		if hexadecimal.fullmatch(raw):
+			addr = int(raw, 16)
+			last_global_label = None
+			# because we don't know whether this label is global or local
+		else:
+			match = global_regex.match(raw)
+			if match:
+				addr = int(match[1], 16)
+				if len(match[0]) == len(raw):  # global_regex.fullmatch
+					last_global_label = addr
+				else:
+					match = local_regex.fullmatch(raw[len(match[0]):])
+					if match:  # full address f_12345.l_67
+						addr += int(match[1], 16)
+			else:
+				match = local_regex.fullmatch(raw)
+				if match:
+					addr = last_global_label + int(match[1], 16)
+
+		if addr is not None:
+			assert addr < len(disasm), f'{addr:05X}'
+			if disasm[addr].startswith('push lr'):
+				tags = 'del lr',
+				addr += 2
+			else:
+				tags = 'rt',
+				a1 = addr + 2
+				while not any(disasm[a1].startswith(x) for x in ('push lr', 'pop pc', 'rt')): a1 += 2
+				if not disasm[a1].startswith('rt'):
+					tags = tags + ('del lr',)
+
+			if real in commands:
+				if ('override rename list' in commands[real][1] or
+						commands[real] == (addr, tags)):
+					continue
+
+			add_command(commands, addr, real, tags=tags, debug_info=f'at {filename}:{line_index}')
+		else:
+			raise ValueError('Invalid line: ' + repr(line))
+
+	return commands
+
+commands = {}
+get_commands('builtins', commands)
+get_commands_from_rename_list('570es+_names.txt', commands)
 
 program = sys.stdin.read().split('\n')[::-1]
 program =[canonicalize(del_inline_comment(line))for line in program]
@@ -187,7 +305,7 @@ adr_of_cmds = [(source_adr, labels[target_label]+offset)
 
 home = 0x8DA4 # initial value of SP before POP PC
 if home + len(result) > 0x8E00:
-	sys.stderr.write('Warning: Program longer than 92 bytes')
+	sys.stderr.write('Warning: Program longer than 92 bytes\n')
 if 'home' in labels: home -= labels['home'] # confusing? ...
 
 min_home = home
