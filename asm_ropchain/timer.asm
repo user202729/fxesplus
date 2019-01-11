@@ -9,10 +9,9 @@ home:
 	er0 = adr_of [-252] home
 	num_fromdigit
 
-	# use-buffer = false
-	# r0 = r2 = 0
-	# er0 = 0x812D
-	# [er0] = r2
+	r0 = r2 = 0
+	er0 = use_buffer
+	[er0] = r2
 
 loop:
 	# y += z
@@ -22,8 +21,8 @@ loop:
 	er0 = adr_of [-242] home
 	num_output_print
 
-	set lr
-	render
+	# set lr
+	# render
 
 	set lr
 	er0 = 0x03e8

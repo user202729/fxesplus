@@ -134,22 +134,26 @@ def get_disassembly(filename):
 	return disasm
 disasm = get_disassembly('fx_570es+_disas.txt')
 
-def get_commands_from_rename_list(filename, commands=None):
+def read_rename_list(filename, commands=None, datalabels=None):
 	'''Try to parse a rename list.
 
 	If the rename list is ambiguous without disassembly, it raises an error.
 
 	Args:
-		commands: A dict to append result to. Not passing any creates a new dict.
+		commands: A dict to add result to. Not passing any creates a new dict.
+		datalabels: A dict to add result to. Not passing any creates a new dict.
 
 	Return:
-		A dict of {name: (address, tags)}
+		A tuple (commands, datalabels), where
+		`commands` has the form {name: (address, tags)}
+		`datalabels` has the form {name: address}
 	'''
 	with open(filename, 'r') as f:
 		data = f.read().splitlines()
 
 	if commands is None: commands = {}
-	line_regex   = re.compile(r'^\s*([\w_.]+)\s*([\w_.]+)')
+	if datalabels is None: datalabels = {}
+	line_regex   = re.compile(r'^\s*([\w_.]+)\s+([\w_.]+)')
 	global_regex = re.compile(r'f_([0-9a-fA-F]+)')
 	local_regex  = re.compile(r'.l_([0-9a-fA-F]+)')
 	data_regex   = re.compile(r'd_([0-9a-fA-F]+)')
@@ -160,8 +164,14 @@ def get_commands_from_rename_list(filename, commands=None):
 		match = line_regex.match(line)
 		if not match: continue
 		raw, real = match[1], match[2]
-		if real.startswith('.') or data_regex.fullmatch(raw):
-			# we only get commands (functions), not local labels or data labels.
+		if real.startswith('.'):
+			# we don't get local labels.
+			continue
+
+		match = data_regex.fullmatch(raw)
+		if match:
+			addr = int(match[1], 16)
+			datalabels[real] = addr
 			continue
 
 		addr = None
@@ -207,11 +217,11 @@ def get_commands_from_rename_list(filename, commands=None):
 		else:
 			raise ValueError('Invalid line: ' + repr(line))
 
-	return commands
+	return commands, datalabels
 
 commands = {}
 get_commands('builtins', commands)
-get_commands_from_rename_list('570es+_names.txt', commands)
+commands, datalabels = read_rename_list('570es+_names.txt', commands)
 
 def sizeof_register(reg_name):
 	# assume reg_name is a valid register name
@@ -291,6 +301,15 @@ def process(line):
 
 		adr_of_cmds.append((len(result), offset, label))
 		result.extend((0,0))
+
+	elif line in datalabels:
+		''' `<label>`. '''
+		process(f'{line}+0')
+
+	elif '+' in line and line[:line.find('+')] in datalabels:
+		''' `<label> + <offset>`. '''
+		label, offset = line.split('+')
+		process(f'0x{datalabels[label]+int(offset,0):04x}')
 
 	elif line in commands:
 		''' `<built-in>`. Equivalent to `call <built-in>`. '''
