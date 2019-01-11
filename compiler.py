@@ -15,6 +15,10 @@ output_format = 'k' if len(sys.argv) == 1 else dict(
 	l = 'l', loader = 'l'
 )[sys.argv[1]]
 
+def note(st):
+	''' Print st to stderr. Used for additional information (note, warning) '''
+	sys.stderr.write(st)
+
 def canonicalize(st):
 	''' Make (st) canonical. '''
 	st = st.lower()
@@ -196,7 +200,7 @@ def get_commands_from_rename_list(filename, commands=None):
 				if 'override rename list' in commands[real][1]:
 					continue
 				if commands[real] == (addr, tags):
-					sys.stderr.write(f'Warning: Duplicated command {real}\n')
+					note(f'Warning: Duplicated command {real}\n')
 					continue
 
 			add_command(commands, addr, real, tags=tags, debug_info=f'at {filename}:{line_index}')
@@ -209,17 +213,23 @@ commands = {}
 get_commands('builtins', commands)
 get_commands_from_rename_list('570es+_names.txt', commands)
 
-program = sys.stdin.read().split('\n')[::-1]
-program =[canonicalize(del_inline_comment(line))for line in program]
-result = [] # list of ints in range 0..255
+def sizeof_register(reg_name):
+	# assume reg_name is a valid register name
+	return {'r':1,'e':2,'x':4,'q':8}[reg_name[0]]
 
+program = sys.stdin.read().split('\n')
+
+result = [] # list of ints in range 0..255
 labels = {}
 adr_of_cmds = [] # list of (source adr, offset, target label)
 
+# Right after the buffer overflow, the memory region [home..home+len(result)[
+# should have value = result (after replacing labels)
 home = None
 
-while program:
-	line = program.pop()
+def process(line):
+	# the processing result will affect those variables
+	global result, labels, adr_of_cmds, home
 
 	if not line: # empty line
 		pass
@@ -228,7 +238,7 @@ while program:
 		''' Compound statement. Syntax:
 		`<statement1> ; <statement2> ; ...`
 		'''
-		program.extend(reversed(line.split(';')))
+		for command in line.split(';'): process(command)
 
 	elif line[-1] == ':':
 		''' Syntax: `<label>:`
@@ -241,7 +251,7 @@ while program:
 
 	elif line.startswith('0x'):
 		''' Syntax: `0x<hexadecimal digits>` '''
-		assert len(line)%2==0, f'Invalid data length: {line}'
+		assert len(line)%2==0, f'Invalid data length'
 		n_byte = len(line)//2-1
 		data = int(line, 16)
 		for _ in range(n_byte):
@@ -256,19 +266,17 @@ while program:
 			adr, tags = commands[line[4:].strip()]
 			for tag in tags:
 				if tag.startswith('warning'):
-					sys.stderr.write(tag+'\n')
+					note(tag+'\n')
 
-		assert 0 <= adr < 0x20000, f'Invalid address: {line}'
+		assert 0 <= adr < 0x20000, f'Invalid address: {adr}'
 		adr = optimize_adr_for_npress(adr)
-		program.append(f'0x{adr+0x30300000:0{8}x}')
+		process(f'0x{adr+0x30300000:0{8}x}')
 
 	elif line.startswith('goto'):
 		''' Syntax: `goto <label>` '''
 		label = line[4:]
-		program.extend((
-			'call sp=er14,pop er14',
-			f'er14 = adr_of [-2] {label}'
-		))
+		process(f'er14 = adr_of [-2] {label}')
+		process('call sp=er14,pop er14')
 
 	elif line.startswith('adr_of'):
 		''' Syntax: `adr_of [offset] <label>` | `adr_of <label>` '''
@@ -286,7 +294,7 @@ while program:
 
 	elif line in commands:
 		''' `<built-in>`. Equivalent to `call <built-in>`. '''
-		program.append('call '+line)
+		process('call '+line)
 
 	elif '=' in line:
 		''' Syntax:
@@ -298,15 +306,21 @@ while program:
 		assert '=' not in value, f'Nested assignment in {line}'
 		value = value.replace(',', ';')
 
-		program.extend((value, f'call pop {register}'))
+		process(f'call pop {register}')
+
+		l1 = len(result)
+		process(value)
+		assert len(result)-l1==sizeof_register(register), \
+				f'Line {line!r} source/destination target mismatches'
 
 	elif line[0] == '$':
-		''' Python eval. '''
+		''' Python eval. The result will be processed as commands. '''
 		x = eval(line[1:])
 		if isinstance(x, str):
-			program.append(x)
-		else:
-			program.extend(x)
+			process(x)
+		elif isinstance(x, list) or isinstance(x, tuple):
+			for command in x:
+				process(x)
 
 	elif line.startswith('org'):
 		''' Syntax: `org <expr>`
@@ -320,7 +334,34 @@ while program:
 		home = home1
 
 	else:
-		assert False, f'Unrecognized command: {line}'
+		assert False, f'Unrecognized command'
+
+
+# Process program
+for input_line in program:
+	line = canonicalize(del_inline_comment(input_line))
+
+	# temporarily redirect notes to note_log
+	note_log = ''
+	note_ = note
+	def note(st):
+		global note_log
+		note_log += st
+
+	old_len_result = len(result)
+	process(line)
+
+	# labels have undetermined value and they are temporarily represented
+	# by zeroes in result list
+	if output_format == 'k' and \
+			any(x != 0 and get_npress(x) > 10 for x in result[old_len_result:]):
+		note('Line generates many keypresses\n')
+
+	# restore warnings
+	note = note_
+	if note_log:
+		note(f'While processing line\n{input_line}\n')
+		note(note_log)
 
 # A list of (source adr, offset relative to `home`).
 adr_of_cmds = [(source_adr, labels[target_label]+offset)
@@ -332,11 +373,11 @@ if output_format in ('k', 'h', 'j'):
 
 	if home == None: # `org` is not used
 		# compute value of `home`
-		home = 0x8DA4 # initial value of SP before POP PC
-		if home + len(result) > 0x8E00:
-			sys.stderr.write(f'Warning: Program length = {len(result)} bytes > 92 bytes\n')
+		home = 0x8DA4  # initial value of SP before POP PC
 		if 'home' in labels:
-			home -= labels['home'] # so that the SP starts at the `home:` label
+			home -= labels['home']  # so that the SP starts at the `home:` label
+		if home + len(result) > 0x8E00:
+			note(f'Warning: Program length = {len(result)} bytes > 92 bytes\n')
 
 		min_home = home
 		while min_home >= 0x8154+200: min_home -= 100
@@ -374,6 +415,10 @@ for source_adr, home_offset in adr_of_cmds:
 	result[source_adr] = target_adr & 0xFF
 	assert result[source_adr+1] == 0
 	result[source_adr+1] = target_adr >> 8
+
+# debug print label location
+for label, home_offset in labels.items():
+	note(f'Label {label} is at address {home+home_offset:04X}\n')
 
 # scroll it around (use the most inefficient way)
 hackstring = list(map(ord,'1234567890'*10)) # but still O(n)
