@@ -1,19 +1,18 @@
 #!/usr/bin/python3
 import re
 import sys
+import argparse
 
 from lib_570esp import *
 
-'''
-Only provide 0 or 1 cmdline argument: output format.
-'''
-assert len(sys.argv) <= 2, 'Too many command-line arguments'
-output_format = 'k' if len(sys.argv) == 1 else dict(
-	h = 'h', hex = 'h', hexadecimal = 'h',
-	k = 'k', key = 'k', keys = 'k', keypresses = 'k',
-	j = 'j', justcode = 'j', code = 'j', raw = 'j',
-	l = 'l', loader = 'l'
-)[sys.argv[1]]
+parser = argparse.ArgumentParser()
+parser.add_argument('-t', '--target', default='overflow',
+		choices=('none', 'overflow', 'loader'),
+		help='how will the output be used')
+parser.add_argument('-f', '--format', default='key',
+		choices=('hex', 'key'),
+		help='output format')
+args = parser.parse_args()
 
 def note(st):
 	''' Print st to stderr. Used for additional information (note, warning) '''
@@ -372,7 +371,7 @@ for input_line in program:
 
 	# labels have undetermined value and they are temporarily represented
 	# by zeroes in result list
-	if output_format == 'k' and \
+	if args.target == 'overflow' and args.format == 'key' and \
 			any(x != 0 and get_npress(x) > 10 for x in result[old_len_result:]):
 		note('Line generates many keypresses\n')
 
@@ -386,8 +385,8 @@ for input_line in program:
 adr_of_cmds = [(source_adr, labels[target_label]+offset)
 	for source_adr, offset, target_label in adr_of_cmds]
 
-if output_format in ('k', 'h', 'j'):
-	if output_format in ('k', 'h'):
+if args.target in ('none', 'overflow'):
+	if args.target == 'overflow':
 		assert len(result) <= 100, 'Program too long'
 
 	if home == None: # `org` is not used
@@ -410,7 +409,7 @@ if output_format in ('k', 'h', 'j'):
 			)
 		)
 
-elif output_format == 'l':
+elif args.target == 'loader':
 	if home == None:
 		home = 0x85b0 - len(result)
 		entry = home + labels.get('home', 0) - 2
@@ -446,16 +445,17 @@ for home_offset, byte in enumerate(result):
 	hackstring[(home+home_offset-0x8154)%100] = byte
 
 # done
-if output_format == 'h':
+if args.target == 'overflow' and args.format == 'hex':
 	print(''.join(f'{byte:0{2}x}' for byte in hackstring))
-elif output_format == 'j':
+elif args.target == 'none' and args.format == 'hex':
 	print('0x%04x:'%home, *map('%02x'.__mod__, result))
-elif output_format == 'l':
+elif args.target == 'loader' and args.format == 'key':
 	print('%s %s:'%(to_key((home - home2) & 255), to_key((home - home2) >> 8)))
 	for i in range(home2):
 			result.insert(0, 0)
 	import keypairs
 	print(keypairs.format(result))
-else:
-	assert output_format == 'k', 'Internal error'
+elif args.target == 'overflow' and args.format == 'key':
 	print(' '.join(map(to_key, hackstring)))
+else:
+	raise ValueError('Unsupported target/format combination')
