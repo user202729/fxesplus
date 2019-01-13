@@ -12,12 +12,17 @@ assert len(sys.argv) < 3, 'Too many command-line arguments'
 output_format = 'k' if len(sys.argv) == 1 else dict(
 	h = 'h', hex = 'h', hexadecimal = 'h',
 	k = 'k', key = 'k', keys = 'k', keypresses = 'k',
-        j = 'j', justcode = 'j', code = 'j', raw = 'j',
-        l = 'l', loader = 'l'
+	j = 'j', justcode = 'j', code = 'j', raw = 'j',
+	l = 'l', loader = 'l',
+	ll='ll', loader2='ll',
+	llh='llh', loader2_hex='llh',
 )[sys.argv[1]]
 
 def canonicalize(st):
 	''' Make (st) canonical. '''
+	if '$' in st:
+		st1, st2 = st.split('$', 1)
+		return canonicalize(st1) + '$' + st2
 	st = st.lower()
 	st = st.strip()
 	# remove spaces around non alphanumeric
@@ -186,18 +191,18 @@ while program:
 		home = hx - len(result)
 
 	else:
-		assert False, f'Unrecognized command: {line}'
+		assert False, f'Unrecognized command: {line}, {program[-1:-5:-1]}'
 
 adr_of_cmds = [(source_adr, labels[target_label]+offset)
     for source_adr, offset, target_label in adr_of_cmds]
 
 if output_format in ('k', 'h'):
-    assert len(result) <= 100, 'Program too long'
+    assert len(result) <= 100, f'Program too long ({len(result)} bytes)'
 
 # now it's a list of (source adr, offset relative to `home`)
 
 if home == None:
-    if output_format != 'l':
+    if output_format not in ('l', 'll', 'llh'):
         home = 0x8DA4 # initial value of SP before POP PC
         if home + len(result) > 0x8E00:
         	sys.stderr.write('Warning: Program longer than 92 bytes (%d bytes)\n'%len(result))
@@ -214,6 +219,11 @@ if home == None:
         		-home # if ties then take max `home`
         	)
         )
+    elif output_format in ('ll', 'llh'):
+        home = 0x85ba
+        if (home + labels.get('home', 0) - 2) % 256 == 0:
+            home += 1
+        assert home + len(result) <= 0x8e00, "Program too long"
     else:
         home = 0x85b0 - len(result)
         entry = home + labels.get('home', 0) - 2
@@ -222,7 +232,7 @@ if home == None:
             result.append(0)
         result.extend((0xff, 0xae, 0x85))
         home2 = 0
-        assert (home - home2) >= 0x8501, 'Program too long'
+        assert (home - home2) >= 0x8501, 'Program too long (%d bytes overflow)'%(0x8501-home+home2)
         while get_npress_adr(home - home2) >= 100:
             home2 += 1
 
@@ -240,6 +250,9 @@ for home_offset, byte in enumerate(result):
 	assert isinstance(byte, int), (home_offset, byte)
 	hackstring[(home+home_offset-0x8154)%100] = byte
 
+for i, j in labels.items():
+    print(i, '=', hex(home + j))
+
 # done
 if output_format == 'h':
 	print(''.join(f'{byte:0{2}x}' for byte in hackstring))
@@ -251,6 +264,16 @@ elif output_format == 'l':
             result.insert(0, 0)
 	import keypairs
 	print(keypairs.format(result))
+elif output_format == 'll':
+	import keypairs
+	print('%s %s:'%(keypairs.get_pair((home + len(result) - 1) & 255), keypairs.get_pair((home + len(result) - 1) >> 8)))
+	entry = home + labels.get('home', 0) - 2
+	if home != 0x85ba: result.insert(0, 0)
+	result[:0] = (0x30, 0x6a, 0x4f, 0x30, 0x30, entry & 255, entry >> 8, 0x68, 0x4f, 0x30, 0)
+	result.reverse()
+	print(keypairs.format(result))
+elif output_format == 'llh':
+	print(bytes(result).hex())
 else:
 	assert output_format == 'k', 'Internal error'
 	print(' '.join(map(to_key, hackstring)))

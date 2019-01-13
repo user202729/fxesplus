@@ -2,16 +2,19 @@ import lib_570esp
 
 from collections import defaultdict
 
-working = ['log(', 'ln(', 'sin(', 'cos(', 'tan(', '(', ')', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'Pol(', 'Rec(', '+', '-', '`', 'A', 'B', 'C', 'D', 'E', 'F', 'X', 'Y', 'M', ',', 'sin⁻(', 'cos⁻(', 'tan⁻(', 'Ran#', 'π', 'RanInt#(', '%', 'Ans', '𝐞', '×', '÷', '!', '=', ':', '×⏨']
+working = ['log(', 'ln(', 'sin(', 'cos(', 'tan(', '(', ')', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'Pol(', 'Rec(', '+', '-', '`', 'A', 'B', 'C', 'D', 'E', 'F', 'X', 'Y', 'M', ',', 'sin⁻(', 'cos⁻(', 'tan⁻(', 'Ran#', 'π', 'RanInt#(', '%', 'Ans', '𝐞', '×', '÷', '!', '=', ':', '×⏨', '.']
 
-alts = {252: 'CALC', 221: 'Int', 212: '^-1', 219: 'logxx', 208: 'Frac', 211: 'sqrt(', 213: '^2', 248: 'ENG', 9: 'hyp', 250: 'S<>D', 238: 'M+', 237: 'EXE', 254: 'DEL'}
+fasts = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '+', '-', '×', '÷', 'Ans', '×⏨', 'DEL', '.', 'AC', 'EXE']
+
+alts = {252: 'CALC', 221: 'Int', 212: '^-1', 219: 'logxx', 208: 'Frac', 211: 'sqrt(', 213: '^2', 248: 'ENG', 9: 'hyp', 250: 'S<>D', 238: 'M+', 237: 'EXE', 254: 'DEL', 230: 'AC', 237: 'EXE'}
 
 working.extend(alts.values())
 
 def get_npress(it):
     ans = 0
     for i in it:
-        if it in alts: ans += 1
+        if to_key(i) in fasts: ans += 0.5
+        elif i in alts: ans += 1
         else: ans += lib_570esp.get_npress(i)
     return ans
 

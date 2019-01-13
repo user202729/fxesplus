@@ -2,8 +2,6 @@ loop:
 	getkeycode
 	er8 = er0
 	getkeycode
-	goto tmp_label
-tmp_label:
 	r2 = r0
 	r0 = r8, pop r8
 	0x3333 # not important, for r8
@@ -18,9 +16,9 @@ y: # address to write to
 after_y:
 	[er0] = r2
 
-	# increment (y)
-	er2 = 0x0101
-	call 0x1852c # those 3 lines set er2 to 1
+	# decrement (y)
+	er2 = 0xffff
+#	call 0x1852c # those 3 lines set er2 to 1
 	er8 = adr_of y
 	[er8] += er2, pop xr8
 	strcpy
@@ -35,3 +33,4 @@ loop_bak:
 	er8 = er0
 	getkeycode
 	$[result.pop(), result.append(0), []][2]
+the_end:
