@@ -13,4 +13,4 @@ wine_tools/obj
 
 **/__pycache__
 **/*disas*.txt
-
+emu-history
