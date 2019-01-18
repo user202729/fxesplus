@@ -80,6 +80,7 @@ Allowed tags:
 1853A		r0 = r2 = 0
 1853C		r0 = r2
 19F9E		R0 &= 15
+13230		{RT} er10 = er2
 
 # ====== Actual functions (or most of)
 # calling convention: register, if use stack, caller have to clean up
