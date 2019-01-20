@@ -1,0 +1,9 @@
+List of known 82ES+A ROM segments: (all numbers are in hexadecimal)
+
+(82ES+A start address) [length] --- (82ES+ emulator start address)
+
+3010 [74] - 2CA6
+3AB8?     - 374E (delay)
+4A0C?     - 46A2 (strcpy)
+
+
