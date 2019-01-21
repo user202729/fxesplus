@@ -19,7 +19,7 @@
 030BE		draw_byte        # take a pointer to a byte on the screen, the bitmask
 				# to draw and the background bitmask. Using draw_mode.
 0312C		render           # copy screen buffer -> screen
-#0343E		multiline_print
+0343C		print_4lines
 0347A		set_up_arrow
 03480		set_down_arrow
 03486		pd_value
@@ -44,6 +44,8 @@
 0B370		char_print_real_screen__  # char(*er0) -> real screen at (*er2)
 0B45E		getkeycode
 1B4EA		invalid_var
+
+10FB4		table_prompt_print    # (byte row)
 
 # ======== Functions that manipulate calculator-level numbers
 # ======== Variable branch at 150BA, jumptable at 1AE6
@@ -205,7 +207,7 @@
 17904		mv_reg6_reg1
 
 13234		num_random        # 'Ran#'
-132DC		mv_i4_1d10       # Used when value of num [er4] is detected as invalid.
+132DC		mv_n4_1d10       # Used when value of num [er4] is detected as invalid.
 
 132EC		num_normalize     # set 2 last bytes to '99 00' <-> multiply by a
 				# power of 10 to make it a value to a number in [0.1, 1[
@@ -234,6 +236,13 @@
 1B0F6		num_fromdigit     # num [er0] = r2, with 0 <= r2 < 10
 				# ('00 00 .. 00' for 0, '0x 00 .. 00 01' for nonzero)
 1B3D4		num_frombyte      # num [er0] = r2
+17498		byte_to_bcd       # (byte) r0 -> (dec16_t) er0
+174C2		bcd_to_byte
+
+1B326		num_get_exp       # int16_t(void)
+.l_03E		.nonneg_exp
+.l_046		.ret
+.l_04C		.ret_5000         # invalid
 
 133FA		num_invalid_zf__  # call below and do a cmp with 1
 1B03E		num_invalid__     # == 1 <-> invalid
@@ -244,7 +253,10 @@
 1A7FE		num_unk_1_1__
 17F5E		num_unk_1_r__     # _r functions operate on the registers.
 04DE0		num_unk_2__
-1B430		num_id_1__
+1B430		num_to_byte       # num[ER0] -> R0, truncated to integer.
+.l_030		.exp_1            # return 0 for some invalid numbers.
+.l_034		.exp_2
+.l_040		.invalid
 
 17D56		num_arith_r       # reg0 = reg0 (arith_op) reg1
 19C0E		num_div_r
