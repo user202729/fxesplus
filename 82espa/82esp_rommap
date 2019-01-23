@@ -2,12 +2,18 @@ List of known 82ES+A ROM segments: (all numbers are in hexadecimal)
 
 (82ES+A start adr) [length] - (570ES+ start adr) - (82ES+ emu start adr)
 
+
+2BA4      - 2B76 ( -2E)
+
+2DB4      - 2D38 ( -7C)
 3010 [74] - 2F94 ( -7C) - 2CA6 (-36A)
 31A8 (?)  - 312C ( -7C) - 2E3E (-36A)      (render)
 
 39B0 [54] - 43D4 (+A24)
 39E6      - 440A (+A24) - 3518 (-4CE)      (gadget "[er8] += er2, pop xr8")
 39EC      - 4410 (+A24) - 351E (-4CE)      (gadget "pop xr8")
+39F6      - 441A (+A24)
+3A24      - 4448 (+A24)
 
 3A76 (?)  - 4486 (+A10) -      (-4E2)      (gadget "pop er0")
 3AA2 (?)  - 44B2 (+A10) - 35C0 (-4E2)      (gadget "pop er2")
@@ -23,6 +29,9 @@ List of known 82ES+A ROM segments: (all numbers are in hexadecimal)
           - 4CE6 (?)    - 3DF6 (?)
 
 4106 (?)  - 4E50 (+D4A)                    (strcpy)
+4124      - 4E6E
+413C      - 4E86
+4152      - 4E9C
 4260 [54] - 4FAA (+D4A)
 
 4E30 [54] - 5A1A (+BEA) - 526C (+43C)
@@ -31,3 +40,10 @@ List of known 82ES+A ROM segments: (all numbers are in hexadecimal)
 5C54 [6]  - xxxx        - xxxx             (only on 82ES+A)
 
 5C5A [2A] - 683E (+C0E) - 6090 (+436)
+
+74EE      - 7EF6 (+A08)
+
+80C6      - 8ABA (+9F4)
+
+104FC - 10E5C (+960)
+15AD6 - 16CF0 (+121A)
