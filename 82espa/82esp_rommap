@@ -5,12 +5,29 @@ List of known 82ES+A ROM segments: (all numbers are in hexadecimal)
 3010 [74] - 2F94 ( -7C) - 2CA6 (-36A)
 31A8 (?)  - 312C ( -7C) - 2E3E (-36A)      (render)
 
-39FA (?)  - 440A (+A10) - 3518 (-4E2)      (gadget "[er8] += er2, pop xr8")
-3A00 (?)  - 4410 (+A10) - 351E (-4E2)      (gadget "pop xr8")
+39B0 [54] - 43D4 (+A24)
+39E6      - 440A (+A24) - 3518 (-4CE)      (gadget "[er8] += er2, pop xr8")
+39EC      - 4410 (+A24) - 351E (-4CE)      (gadget "pop xr8")
+
 3A76 (?)  - 4486 (+A10) -      (-4E2)      (gadget "pop er0")
 3AA2 (?)  - 44B2 (+A10) - 35C0 (-4E2)      (gadget "pop er2")
 3AAE [54] - 44BE (+A10) - 35CC (-4E2)
-3C30 (?)  - 4640 (+A10) - 374E (-4E2)      (delay)
 
-4266 (?)  - 4E50 (+BEA) - 46A2 (+43C)      (strcpy)
+3C30 [54] - 463A (+A0A)
+3C36      - 4640 (+A0A) - 374E (-4E8)      (delay)
+3DFC (?)  - 4806 (+A0A) - 3914 (-4E8)
+
+          - 4830 (?)    - 3940 (?)
+          - 4AB6 (?)                       (possible gadget to read segment 1)
+          - 4BA0 (?)                       (checksum function)
+          - 4CE6 (?)    - 3DF6 (?)
+
+4106 (?)  - 4E50 (+D4A)                    (strcpy)
+4260 [54] - 4FAA (+D4A)
+
 4E30 [54] - 5A1A (+BEA) - 526C (+43C)
+5C30 [24] - 681A (+BEA) - 606C (+43C)
+
+5C54 [6]  - xxxx        - xxxx             (only on 82ES+A)
+
+5C5A [2A] - 683E (+C0E) - 6090 (+436)
