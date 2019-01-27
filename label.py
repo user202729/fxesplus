@@ -8,7 +8,7 @@
 
 import re, sys
 
-names_filename = '570es+_names.txt'
+names_filename = 'labels'
 
 with open(names_filename, 'r') as f:
 	names = f.read().splitlines()

@@ -1,6 +1,3 @@
-[submodule "U8DevTool"]
-	path = U8DevTool
-	url = https://github.com/user202729/U8DevTool
 [submodule "CasioEmu"]
 	path = CasioEmu
 	url = https://github.com/user202729/CasioEmu

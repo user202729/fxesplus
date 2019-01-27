@@ -1,8 +1,8 @@
 #!/bin/sh
 
 if [[ $# == 0 ]]; then
-	input="82esp_emu_rom.bin"
-	output="82esp_emu_brief_disas.txt"
+	input="82esp/emu_rom.bin"
+	output="82esp/emu_brief_disas.txt"
 elif [[ $# == 2 ]]; then
 	input="$1"
 	output="$2"
@@ -11,4 +11,4 @@ else
 	exit
 fi
 
-../disas/bin/u8-disas-brief "$input" 0 $(wc -c < "$input") "$output"
+disas/bin/u8-disas-brief "$input" 0 $(wc -c < "$input") "$output"

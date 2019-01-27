@@ -1,5 +1,5 @@
 #!/bin/sh
-cd "$(dirname $0)"
+cd "$(dirname $0)/.."
 if [ ! -f CasioEmu/models/fx570esplus/rom.bin ]; then
 	cp -l rom.bin CasioEmu/models/fx570esplus/rom.bin
 fi

@@ -6,7 +6,7 @@
 import re
 
 addr_regex = re.compile(r'[0-9a-fA-F]{4,6}\b')
-names_filename = '570es+_names.txt'
+names_filename = 'labels'
 
 out = ''
 seen_addrs = set()

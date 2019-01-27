@@ -70,7 +70,7 @@ def get_binary(filename):
 	result = file.read()
 	file.close()
 	return result
-rom = get_binary('/home/user202729/fxesplus/rom.bin')
+rom = get_binary('rom.bin')
 
 def get_symbols(rom):
 	symbols = [''] * 256

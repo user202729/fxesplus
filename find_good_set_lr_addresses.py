@@ -1,6 +1,10 @@
+# Note: This script is currently unusable.
+
+
+
 # Find addresses to call to set LR to a "POP PC" command with
 # minimal effect on the calculator.
-# This is supposed to be called only once (per ROM) to fill builtins list.
+# This is supposed to be called only once (per ROM) to fill gadgets list.
 
 st='''
 002764   01 F0 50 4E        BL      00h:04E50h

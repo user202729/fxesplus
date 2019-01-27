@@ -131,7 +131,7 @@ def get_disassembly(filename):
 			while addr >= len(disasm): disasm.append('')
 			disasm[addr] = match[1]
 	return disasm
-disasm = get_disassembly('fx_570es+_disas.txt')
+disasm = get_disassembly('disas.txt')
 
 def read_rename_list(filename, commands=None, datalabels=None):
 	'''Try to parse a rename list.
@@ -219,8 +219,8 @@ def read_rename_list(filename, commands=None, datalabels=None):
 	return commands, datalabels
 
 commands = {}
-get_commands('builtins', commands)
-commands, datalabels = read_rename_list('570es+_names.txt', commands)
+get_commands('gadgets', commands)
+commands, datalabels = read_rename_list('labels', commands)
 
 def sizeof_register(reg_name):
 	# assume reg_name is a valid register name

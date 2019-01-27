@@ -1,5 +1,5 @@
 test
-chartable.txt
+**/chartable
 
 classwiz/92+sc/disassembler*.lua
 disas/bin
