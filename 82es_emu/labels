@@ -1,0 +1,118 @@
+# ======== Variable branch at 12BD4, jumptable at 0AAA (used to calculate r)
+
+11C94
+11C94
+11C8C
+11C84
+11C7C
+11C74
+11C6C
+11C0E
+11C0E
+11B9A
+11B16
+11A86
+119F8
+1197C
+11BD8
+1183C
+11B5E
+11ADA
+11A48
+119C2
+11944
+13102
+
+# ======== Variable branch at 15B5A, jumptable at 06DC
+
+1B446
+1B45C
+12EC0
+12EF0
+12DB0
+12E60
+12E90
+12D34
+12CFE
+12C9E
+12CCE
+12E32
+12E1C
+12DFA
+12DE4
+12D7A
+12D64
+12C2E
+12BF2
+12C70
+12BB4
+12F68
+12F52
+12F3C
+12F26
+130B4
+
+# ======== Variable branch at 15D52, jumptable at 04E6
+
+15776
+15786
+157EA
+15862
+15978
+15ADA
+15B38
+15B90
+15BC2
+15C5C
+15CCE
+
+# ======== Variable branch at 1BF26, jumptable at 21F0
+
+1FD08
+##### 1FD08
+1FCC4
+##### 1FCC4
+1FD6C
+1FD76
+1F6B4
+1BE72
+##### 1BE72
+##### 1BE72
+1F6E0
+1F766
+##### 1BE72
+1F7EE
+##### 1F766
+##### 1F766
+##### 1F7EE
+##### 1BE72
+1FD38
+##### 1FD38
+##### 1FD38
+##### 1FD38
+1FBE4
+##### 1FBE4
+1FC4E
+1FC7C
+1FB46
+1FB90
+##### 1BE72
+##### 1BE72
+1FCAA
+1D8CC
+1D834
+1D758
+1DC88
+1DC98
+1DF0A
+1DF58
+1DFA6
+1D87E
+1D7EA
+
+# ======== Data labels (also see the cheat table)
+
+d_080F9		mode
+				# comp 193, cmplx 196, stat 3, basen 2, eqn 69, mat 6,
+				# table 136, vct 7
+d_080FA		submode       # base-n:(base-1),ineq:(degree+1),stat:1~8,etc.
