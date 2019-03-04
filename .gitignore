@@ -1,16 +1,16 @@
-test
-**/chartable
+/test
+chartable
 
-classwiz/92+sc/disassembler*.lua
-disas/bin
-disas/obj
+/classwiz/92+sc/disassembler*.lua
+/disas/bin
+/disas/obj
 
-wine_tools/lib
-wine_tools/*.lib
-wine_tools/*.lst
-wine_tools/main.*
-wine_tools/obj
+/wine_tools/lib
+/wine_tools/*.lib
+/wine_tools/*.lst
+/wine_tools/main.*
+/wine_tools/obj
 
-**/__pycache__
-**/*disas*.txt
-emu-history
+__pycache__
+*disas*.txt
+.emu_history
