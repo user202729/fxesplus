@@ -1,18 +1,70 @@
-#!/usr/bin/python3
 import re
 import sys
-import argparse
+from functools import lru_cache
 
-from lib_570esp import *
+def set_font(font_):
+	global font, font_assoc
+	font = font_
+	font_assoc = dict((c,i) for i,c in enumerate(font))
 
-parser = argparse.ArgumentParser()
-parser.add_argument('-t', '--target', default='overflow',
-		choices=('none', 'overflow', 'loader'),
-		help='how will the output be used')
-parser.add_argument('-f', '--format', default='key',
-		choices=('hex', 'key'),
-		help='output format')
-args = parser.parse_args()
+def from_font(st):
+	return [font_assoc[char] for char in st]
+
+def to_font(charcodes):
+	return ''.join(font[charcode] for charcode in charcodes)
+
+def set_npress_array(npress_):
+	global npress
+	npress = npress_
+
+def set_symbolrepr(symbolrepr_):
+	global symbolrepr
+	symbolrepr = symbolrepr_
+
+@lru_cache(maxsize=256)
+def byte_to_key(byte):
+	if byte==0:
+		return '<NUL>'
+
+	offset=0
+	sym=symbolrepr[byte]
+	while byte and npress[byte]>=100:
+		byte=byte-1
+		offset+=1
+	typesym=symbolrepr[byte] if byte else 'NUL'
+
+	if set(sym)&set('\'"<>:'): sym=repr(sym)
+	if set(typesym)&set('\'"<>:+'): typesym=repr(typesym)
+
+	if offset==0:
+		return sym
+	else:
+		return f'<{sym}:{typesym}+{offset}>'
+
+
+def get_npress(charcodes):
+	if isinstance(charcodes, int): charcodes = (charcodes,)
+	return sum(npress[charcode] for charcode in charcodes)
+
+def get_npress_adr(adrs):
+	if isinstance(adrs, int): adrs = (adrs,)
+	assert all(0 <= adr < 0x20000 for adr in adrs)
+	return sum(get_npress((adr&0xFF,(adr>>8)&0xFF)) for adr in adrs)
+
+def optimize_adr_for_npress(adr):
+	'''
+	For a 'POP PC' command, the lowest significant bit in the address
+	does not matter. This function use that fact to minimize number
+	of key strokes used to enter the hackstring.
+	'''
+	return min((adr, adr^1), key=get_npress_adr)
+
+def optimize_sum_for_npress(total):
+	''' Return (a, b) such that a + b == total. '''
+	return ['0x'+hex(x)[2:].zfill(4) for x in min(
+		((x, (total-x)%0x10000) for x in range(0x0101, 0x10000)),
+		key=get_npress_adr
+	)]
 
 def note(st):
 	''' Print st to stderr. Used for additional information (note, warning) '''
@@ -55,19 +107,20 @@ def add_command(command_dict, address, command, tags, debug_info=''):
 	command_dict[command] = (address, tuple(tags))
 
 
-def get_commands(filename, commands=None):
+# A dict of {name: (address, tags)} to append result to.
+commands = {}
+datalabels = {}
+
+def get_commands(filename):
 	''' Read a list of gadget names.
 
 	Args:
-		commands: A dict to append result to. Not passing any creates a new dict.
-
-	Return:
-		A dict of {name: (address, tags)}
+		A dict 
 	'''
+	global commands
 	with open(filename, 'r') as f:
 		data = f.read().splitlines()
 
-	if commands is None: commands = {}
 	in_comment = False
 	line_regex = re.compile('([0-9a-fA-F]+)\s+(.+)')
 	for line_index, line in enumerate(data):
@@ -107,18 +160,14 @@ def get_commands(filename, commands=None):
 
 		add_command(commands, address, command, tags, f'at {filename}:{line_index}')
 
-	return commands
-
 def get_disassembly(filename):
 	'''Try to parse a disassembly file with annotated address.
 
 	Each line should look like this:
 
 		mov r2, 1                      ; 0A0A2 | 0201
-
-	Return:
-		A list of strings.
 	'''
+	global disasm
 	with open(filename, 'r') as f:
 		data = f.read().splitlines()
 
@@ -130,28 +179,16 @@ def get_disassembly(filename):
 			addr = int(match[2], 16)
 			while addr >= len(disasm): disasm.append('')
 			disasm[addr] = match[1]
-	return disasm
-disasm = get_disassembly('disas.txt')
 
-def read_rename_list(filename, commands=None, datalabels=None):
+def read_rename_list(filename):
 	'''Try to parse a rename list.
 
 	If the rename list is ambiguous without disassembly, it raises an error.
-
-	Args:
-		commands: A dict to add result to. Not passing any creates a new dict.
-		datalabels: A dict to add result to. Not passing any creates a new dict.
-
-	Return:
-		A tuple (commands, datalabels), where
-		`commands` has the form {name: (address, tags)}
-		`datalabels` has the form {name: address}
 	'''
+	global commands, datalabels
 	with open(filename, 'r') as f:
 		data = f.read().splitlines()
 
-	if commands is None: commands = {}
-	if datalabels is None: datalabels = {}
 	line_regex   = re.compile(r'^\s*([\w_.]+)\s+([\w_.]+)')
 	global_regex = re.compile(r'f_([0-9a-fA-F]+)')
 	local_regex  = re.compile(r'.l_([0-9a-fA-F]+)')
@@ -216,17 +253,9 @@ def read_rename_list(filename, commands=None, datalabels=None):
 		else:
 			raise ValueError('Invalid line: ' + repr(line))
 
-	return commands, datalabels
-
-commands = {}
-get_commands('gadgets', commands)
-commands, datalabels = read_rename_list('labels', commands)
-
 def sizeof_register(reg_name):
 	# assume reg_name is a valid register name
 	return {'r':1,'e':2,'x':4,'q':8}[reg_name[0]]
-
-program = sys.stdin.read().split('\n')
 
 result = [] # list of ints in range 0..255
 labels = {}
@@ -354,108 +383,116 @@ def process(line):
 	else:
 		assert False, f'Unrecognized command'
 
+def process_program(args, program, overflow_initial_sp):
+	'''
+	Take a program (list of command lines) and print the compiled program
+	to the console.
+	'''
+	global result, labels, adr_of_cmds, home
 
-# Process program
-for input_line in program:
-	line = canonicalize(del_inline_comment(input_line))
+	for input_line in program:
+		line = canonicalize(del_inline_comment(input_line))
 
-	# temporarily redirect notes to note_log
-	note_log = ''
-	note_ = note
-	def note(st):
-		global note_log
-		note_log += st
+		# temporarily redirect notes to note_log
+		note_log = ''
+		global note
+		note_ = note
+		def note(st):
+			nonlocal note_log
+			note_log += st
 
-	old_len_result = len(result)
-	process(line)
+		old_len_result = len(result)
+		process(line)
 
-	# labels have undetermined value and they are temporarily represented
-	# by zeroes in result list
-	if args.target == 'overflow' and args.format == 'key' and \
-			any(x != 0 and get_npress(x) > 10 for x in result[old_len_result:]):
-		note('Line generates many keypresses\n')
+		# labels have undetermined value and they are temporarily represented
+		# by zeroes in result list
+		if args.target == 'overflow' and args.format == 'key' and \
+				any(x != 0 and get_npress(x) > 10 for x in result[old_len_result:]):
+			note('Line generates many keypresses\n')
 
-	# restore warnings
-	note = note_
-	if note_log:
-		note(f'While processing line\n{input_line}\n')
-		note(note_log)
+		# restore warnings
+		note = note_
+		if note_log:
+			note(f'While processing line\n{input_line}\n')
+			note(note_log)
 
-# A list of (source adr, offset relative to `home`).
-adr_of_cmds = [(source_adr, labels[target_label]+offset)
-	for source_adr, offset, target_label in adr_of_cmds]
+	# A list of (source adr, offset relative to `home`).
+	adr_of_cmds = [(source_adr, labels[target_label]+offset)
+		for source_adr, offset, target_label in adr_of_cmds]
 
-if args.target in ('none', 'overflow'):
-	if args.target == 'overflow':
-		assert len(result) <= 100, 'Program too long'
+	if args.target in ('none', 'overflow'):
+		if args.target == 'overflow':
+			assert len(result) <= 100, 'Program too long'
 
-	if home == None: # `org` is not used
-		# compute value of `home`
-		home = 0x8DA4  # initial value of SP before POP PC
-		if 'home' in labels:
-			home -= labels['home']  # so that the SP starts at the `home:` label
-		if home + len(result) > 0x8E00:
-			note(f'Warning: Program length = {len(result)} bytes > 92 bytes\n')
+		if home == None: # `org` is not used
+			# compute value of `home`
+			home = overflow_initial_sp
+			if 'home' in labels:
+				home -= labels['home']  # so that the SP starts at the `home:` label
+			if home + len(result) > 0x8E00:
+				note(f'Warning: Program length after home = {len(result)} bytes'
+						f' > {0x8E00-home} bytes\n')
 
-		min_home = home
-		while min_home >= 0x8154+200: min_home -= 100
-		while home + len(result) <= 0x8E00: home += 100 # 0x8E00: end of RAM
-		home = min(range(min_home, home, 100), key=lambda home:
-			(
-				sum( # count number of ... satisfy condition
-					get_npress_adr(home+home_offset) >= 100
-					for source_adr, home_offset in adr_of_cmds),
-				-home # if ties then take max `home`
+			min_home = home
+			while min_home >= 0x8154+200: min_home -= 100
+			while home + len(result) <= 0x8E00: home += 100 # 0x8E00: end of RAM
+			home = min(range(min_home, home, 100), key=lambda home:
+				(
+					sum( # count number of ... satisfy condition
+						get_npress_adr(home+home_offset) >= 100
+						for source_adr, home_offset in adr_of_cmds),
+					-home # if ties then take max `home`
+				)
 			)
-		)
 
-elif args.target == 'loader':
-	if home == None:
-		home = 0x85b0 - len(result)
-		entry = home + labels.get('home', 0) - 2
-		result.extend((0x6a, 0x4f, 0, 0, entry & 255, entry >> 8, 0x68, 0x4f, 0, 0))
-		while home + len(result) < 0x85d7:
-			result.append(0)
-		result.extend((0xff, 0xae, 0x85))
-		home2 = 0
-		assert (home - home2) >= 0x8501, 'Program too long'
-		while get_npress_adr(home - home2) >= 100:
-			home2 += 1
+	elif args.target == 'loader':
+		if home == None:
+			home = 0x85b0 - len(result)
+			entry = home + labels.get('home', 0) - 2
+			result.extend((0x6a, 0x4f, 0, 0, entry & 255, entry >> 8, 0x68, 0x4f, 0, 0))
+			while home + len(result) < 0x85d7:
+				result.append(0)
+			result.extend((0xff, 0xae, 0x85))
+			home2 = 0
+			assert (home - home2) >= 0x8501, 'Program too long'
+			while get_npress_adr(home - home2) >= 100:
+				home2 += 1
 
-else:
-	assert False, 'Internal error'
+	else:
+		assert False, 'Internal error'
 
-# home is picked now, now substitute in the result
-assert home is not None
-for source_adr, home_offset in adr_of_cmds:
-	target_adr = home + home_offset
-	assert result[source_adr] == 0
-	result[source_adr] = target_adr & 0xFF
-	assert result[source_adr+1] == 0
-	result[source_adr+1] = target_adr >> 8
+	# home is picked now, now substitute in the result
+	assert home is not None
+	for source_adr, home_offset in adr_of_cmds:
+		target_adr = home + home_offset
+		assert result[source_adr] == 0
+		result[source_adr] = target_adr & 0xFF
+		assert result[source_adr+1] == 0
+		result[source_adr+1] = target_adr >> 8
 
-# debug print label location
-for label, home_offset in labels.items():
-	note(f'Label {label} is at address {home+home_offset:04X}\n')
+	# debug print label location
+	for label, home_offset in labels.items():
+		note(f'Label {label} is at address {home+home_offset:04X}\n')
 
-# scroll it around (use the most inefficient way)
-hackstring = list(map(ord,'1234567890'*10)) # but still O(n)
-for home_offset, byte in enumerate(result):
-	assert isinstance(byte, int), (home_offset, byte)
-	hackstring[(home+home_offset-0x8154)%100] = byte
+	# scroll it around (use the most inefficient way)
+	hackstring = list(map(ord,'1234567890'*10)) # but still O(n)
+	for home_offset, byte in enumerate(result):
+		assert isinstance(byte, int), (home_offset, byte)
+		hackstring[(home+home_offset-0x8154)%100] = byte
 
-# done
-if args.target == 'overflow' and args.format == 'hex':
-	print(''.join(f'{byte:0{2}x}' for byte in hackstring))
-elif args.target == 'none' and args.format == 'hex':
-	print('0x%04x:'%home, *map('%02x'.__mod__, result))
-elif args.target == 'loader' and args.format == 'key':
-	print('%s %s:'%(to_key((home - home2) & 255), to_key((home - home2) >> 8)))
-	for i in range(home2):
+	# done
+	if args.target == 'overflow' and args.format == 'hex':
+		print(''.join(f'{byte:0{2}x}' for byte in hackstring))
+	elif args.target == 'none' and args.format == 'hex':
+		print('0x%04x:'%home, *map('%02x'.__mod__, result))
+	elif args.target == 'loader' and args.format == 'key':
+		# NOTE: loader target may be specific to 570es+/991es+
+		print('%s %s:'%(byte_to_key((home - home2) & 255), byte_to_key((home - home2) >> 8)))
+		for i in range(home2):
 			result.insert(0, 0)
-	import keypairs
-	print(keypairs.format(result))
-elif args.target == 'overflow' and args.format == 'key':
-	print(' '.join(map(to_key, hackstring)))
-else:
-	raise ValueError('Unsupported target/format combination')
+		import keypairs
+		print(keypairs.format(result))
+	elif args.target == 'overflow' and args.format == 'key':
+		print(' '.join(byte_to_key(x) for x in hackstring))
+	else:
+		raise ValueError('Unsupported target/format combination')

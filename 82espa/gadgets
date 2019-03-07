@@ -1,0 +1,97 @@
+/*
+Used by `compiler.py`.
+
+#? line with only `/*` starts a multi-line comment. A line with only `*/` ends it.
+The `/*` and `*/` should be on their own line.
+#? `#` character starts an inline comment.
+
+Each line should either be empty or have the format
+
+    <address><tab character><description>
+
+`<address>` are in hexadecimal.
+
+`<description>` should not contains tab character or `;`.
+Spaces between non-alphanumeric characters are insignificant.
+Leading/trailing spaces are insignificant.
+Case-insensitive.
+
+{curly brackets} at the begin of description are meta-tags. Case insensitive.
+
+Allowed tags:
+
+* `{set lr}`: Jumping to this function sets the value of LR (and LCSR)
+   to an instruction that pops PC, or have similar behavior.
+* `{del lr}`: Reverse of {set lr}.
+* `{rt}`: This function ends with a RT (or have similar behavior),
+   in order to properly control the PC after jumping to this,
+   it's necessary for LR to have specific values.
+* `{override rename list}`: Override the auto-detected information in `570es+_names.txt`.
+* `{warning ...}`: Gives a warning when the gadget/function is used.
+
+*/
+
+#adr		description
+#----------------------
+
+0278E		{Set LR} {Override rename list} strcpy_null
+02798		[ER0] = R2
+029D6		pop xr12
+02ADC		{RT} r0 >>= 4
+02D1C		r0 = r8, pop r8
+02DB0		pop er4
+031FE		{RT} R0 = R2, pop xr8
+0331C		pop er0
+0331E		no-op
+#?????		pop er12
+#?????		r2 = r0
+039E6		[er8] += er2, pop xr8
+03A08		{RT} [er10] = er8, pop qr8
+03AA2		pop er2
+04106		{override rename list} {warning use strcpy_null instead} strcpy
+03D18		{Set LR} KO = R2 = 0             # expensive
+0421E		sp = er14, pop er14
+04220		pop er14
+06A40		er2 = er0, pop er8
+06A42		er0 = er2, pop er8
+06A44		pop er8
+074F0		{RT} memcpy, pop er14
+07E08		{RT} er0 = er2
+080FA		{RT} er2 = 1, r0 = 1
+07E02		er0 = max<unsigned>(er0, er2)
+
+11458		bl er12
+
+				# use after {Del LR} functions and before {RT} function
+1152B		{Set LR} set lr
+#?????		{RT} [er0] = er2
+#?????		{RT} ER0 += ER2, ER8 = [ER0]
+#?????		{RT} ER8 = [ER0]
+#?????		er0 = er8                        # expensive
+12CC0		r0 = [er2]
+12E1A		r0 = 0, pop er14 r4
+12F4E		er8 = er0
+13E1A		pop xr0
+1413A		r2 = r4
+15692		r0 = r8, pop xr8
+15696		pop xr8
+15AC0		memcpy, pop er0 er4
+15AD2		{RT} ER0 += ER2
+17214		r0 = r2 = 0
+17216		r0 = r2
+18C78		R0 &= 15
+#?????		{RT} er10 = er2
+1A16C		{Set LR} num_frombyte_rt
+1A16E		{Set LR} {Override rename list} {warning use num_frombyte_rt if possible} num_frombyte
+
+# ====== Actual functions (or most of)
+# calling convention: register, if use stack, caller have to clean up
+
+031B2		{RT} Render, pop er0 qr8 xr4     # *(stack-front) -> real screen
+034BD		multiline ASCII                  # at ER0, R2 lines
+0369C		{Set LR} Render buffer
+
+03E8E		{RT} memmove                     # similar to memcpy
+				# er0 <- er2. Call 4e50. Do nothing if er2 == 0.
+
+0AC42		{Del LR} wait for key

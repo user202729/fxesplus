@@ -1,0 +1,568 @@
+# ======== Functions and data labels. Not include gadgets.
+
+# Arguments are 0-indexing.
+# All lines with '#' won't match the Lua pattern so they're effectively
+# comments. Comment for something is put **after** it.
+# Functions with trailing `__` are uncertain.
+# ========
+
+0277E		strlen_null      # strlen, but treat NULL as ""
+02788		strcpy_null
+0279C		strcat_null      # delete target if try to cat NULL
+
+02B3E		basen_base_print
+02C70		num_output_print # takes num*, if == NULL then print ''
+02D5C		buffer_clear_lastnline
+02DB4		buffer_clear
+02F36		char_print       # r0: col, r1: row, r2: char
+02EF4		line_print.col_0
+02EF6		line_print       # r0: col, r1: row, er2: address
+0313A		draw_byte        # take a pointer to a byte on the screen, the bitmask
+				# to draw and the background bitmask. Using draw_mode.
+031A8		render           # copy screen buffer -> screen
+034B8		print_4lines
+034F6		set_up_arrow
+034FC		set_down_arrow
+03502		pd_value
+03A98		memzero
+03B8E		reset_magic_string
+03B9C		need_reset  # check magic string and various things
+.l_03C		.yes
+.l_042		.no
+03BE4		shutdown
+03C36		delay       # 04640
+?????		diagnostic_mode
+?????		hex_byte    # r0 -> 2-byte string in er0
+04106		strcpy
+0748C		memset
+074EE		memcpy
+081AE		strlen
+081CC		strchr
+08C10		far_call_stub  # it's likely that the compiler auto generate
+				# this to call far function pointer
+08C12		strcat
+0A4E2		table_home  # go to row 1 col 1 of table
+0A598		reset_all
+0A6C2		keypress_wait__
+0A98A		char_print_real_screen__  # char(*er0) -> real screen at (*er2)
+0AA78		getkeycode
+
+080E8		f_08ADC  # bool(void): mode == table && [80fc] == 1
+
+0AECE		f_0B8B8  # void(byte) : param is a bitmask
+				# bit 7: keep formula (if turned off, formula at 8154 is reset)
+				# bit 0~3:
+				#   * clear screen (if all 0, not clear screen buffer)
+				#   * if !=2, not call f_0B998 (print prev result?)
+				# f_0A564: if return != 0: enter small text at bottom of screen
+0AFAE		f_0B998  # void(???)
+				# print output '0', unless f_08ADC or f_087BA
+1A282		invalid_var
+
+10668		table_prompt_print    # (byte row)
+
+# ======== Functions that manipulate calculator-level numbers
+# ======== Variable branch at 150BA, jumptable at 1AE6
+
+?????
+?????
+?????
+?????		mat_det
+?????
+12CD4
+?????
+13038
+1303C
+?????		mat_add
+?????		mat_sub
+?????		mat_mul_num
+?????		mat_div
+?????
+?????
+?????		mat_mul
+13058
+1277A		num_stat_P
+1281A		num_stat_Q
+12834		num_stat_R
+1305C
+13086
+?????
+
+# unary functions (decimal index 23..28, see code at 150A0)
+?????
+193F0		num_abs
+130FE		num_rnd
+13054
+##### 14792
+19610		num_sinh
+
+195FE		num_cosh
+195EC		num_tanh
+195DA		num_asinh
+195C8		num_acosh
+1950E		num_atanh
+1930C		num_exp
+192F8		num_10xp
+19860		num_sqrt
+19320		num_ln
+19950		num_cbrt
+136C6		num_sin
+136D0		num_cos
+13766		num_tan
+19646		num_asin
+19634		num_acos
+19622		num_atan
+19334		num_log10
+##### 14792
+##### 14792
+191C8		num_log
+1359A		num_pol
+135A2		num_rec
+131A2
+131DE
+1321A
+1325E
+##### 14796
+13374		num_add
+13380		num_sub
+1338C		num_mul
+13398		num_div
+##### 14792
+1347E
+191F0		num_permu
+191DC		num_combi
+12330
+1237E
+12302
+12314
+19F50		num_negate
+##### 14792
+##### 14792
+##### 14792
+##### 14792
+13498		num_frac
+13340		num_cmplx_pow
+1089E		num_nthroot
+##### 14792
+12858		num_stat_to_t
+##### 14792
+##### 14792
+15B74		num_inverse
+15B52		num_square
+15B16		num_cube
+135C2		num_percent
+19280		num_factorial
+135D4		num_deg
+135D8		num_rad
+135DC		num_grad
+19BBE		cmplx_abs
+13176		cmplx_rnd
+19CDC
+133DE		cmplx_add
+133F2		cmplx_sub
+13406		cmplx_mul
+1346A		cmplx_div
+1318E		cmplx_negate
+133CA		cmplx_inverse
+?????		cmplx_square
+?????		cmplx_cube
+1927E
+?????		num_randint
+
+# ======== Other functions
+
+
+?????		num_sum_1__
+14640		num_eval__
+03B3E		st_var    # void (int8_t var_index, cmplx* src)
+03ADE		l_var     # void (int8_t var_index, cmplx* dest)
+
+19E40		num_cmp     # 2 if n0<n2, 1 if n0==n2, 4 if n0>n2
+07BE8		num_to_str      # char num_to_str(num const*, char*)
+1A222		num_cpy
+
+# Arithmetic functions on num call this function and f_14A00.
+# It's not clear what f_14A00 does, but it does not affect the
+# calculated result.
+
+19770		num_sub_1
+19784		num_add_1
+197AC		num_mul_1
+19798		num_div_1
+?????		cmplx_square_1  # have er2 == er0 when calling
+
+18C02		l_regs          # Load register from argument
+18C0A		l_reg0
+18C2A		l_reg1
+# Note that regs are stored in shuffled order -- if num is [0123456789],
+# reg is [8976543210]
+
+18C38		st_reg0	        # Store register to argument
+18C5E		st_reg1
+
+17C7C		invalid_reg1	# first digit (last in reg order) >= 10
+17C84		invalid_reg0
+
+1656C		mv_reg0_reg1
+165A2		mv_reg0_reg3
+164DC		mv_reg0_reg4
+16590		mv_reg0_reg6
+1655A		mv_reg1_reg0
+16536		mv_reg1_reg3
+164EE		mv_reg1_reg4
+164A6		mv_reg1_reg5
+16512		mv_reg1_reg6
+16548		mv_reg3_reg0
+165B4		mv_reg3_reg1
+16500		mv_reg4_reg0
+164CA		mv_reg5_reg0
+164B8		mv_reg5_reg1
+16524		mv_reg6_reg0
+1657E		mv_reg6_reg1
+
+?????		num_random        # 'Ran#'
+?????		mv_n4_1d10       # Used when value of num [er4] is detected as invalid.
+
+?????		num_normalize     # set 2 last bytes to '99 00' <-> multiply by a
+				# power of 10 to make it a value to a number in [0.1, 1[
+
+15EC6		num_compute_header__
+.l_04C		.ret_04
+.l_04E		.ret
+.l_050		.ret_01
+.l_054		.ret_02
+.l_058		.ret_f0
+15E4A		set_reg1_10
+15E60		set_reg1_100d9    # 100/9 = 11.1111...
+15E7A		set_reg1_1d10     # 1/10 = 0.1
+15E94		set_reg1_200
+15EAE		set_reg1_180
+
+1A120		num_trunc__      # may be floor. Used by num_random.
+1A02E		num_mulxp__       # num [er0] *= 10 ^ er2
+
+?????		mv_n8_n4          # mv_nx_ny: numcpy(num [ERx] <- num [ERy])
+?????		mv_n0_n4
+?????		mv_n10_n4
+?????		mv_n10_n2
+?????		mv_n0_n2
+
+19E8E		num_fromdigit     # num [er0] = r2, with 0 <= r2 < 10
+				# ('00 00 .. 00' for 0, '0x 00 .. 00 01' for nonzero)
+1A16C		num_frombyte      # num [er0] = r2
+15F22		byte_to_bcd       # (byte) r0 -> (dec16_t) er0
+15F4C		bcd_to_byte
+
+1A0BE		num_get_exp       # int16_t(void)
+.l_03E		.nonneg_exp
+.l_046		.ret
+.l_04C		.ret_5000         # invalid
+
+?????		num_invalid_zf__  # call below and do a cmp with 1
+19DD6		num_invalid__     # == 1 <-> invalid
+
+?????		num_mul_2__
+
+03F0C		num_unk_1__       # used by random function.
+194D8		num_unk_1_1__
+16C30		num_unk_1_r__     # _r functions operate on the registers.
+04096		num_unk_2__
+1A1C8		num_to_byte       # num[ER0] -> R0, truncated to integer.
+.l_030		.exp_1            # return 0 for some invalid numbers.
+.l_034		.exp_2
+.l_040		.invalid
+
+16A1A		num_arith_r       # reg0 = reg0 (arith_op) reg1
+188E8		num_div_r
+18A32		num_mul_r
+18D1E		num_sub_r
+18D4C		num_add_r
+18D94		num_add1_r__
+18D6C		num_sub1_r__
+
+# ======== Variable branch at 15D30, jumptable at 17A8
+13FA2		num_sum__     # variable x is restored here
+13FB2
+1405C
+140FA
+14218
+143F2
+14450
+144B6
+144E8
+14582
+14608
+
+# ======== Far call at 09A12, jumptable at 1FB6
+# It's not known what those functions do. However, ways to call the function
+# is listed if known, which may help determining their function.
+
+0BFCE		# navigating boxes of int
+##### 0C806
+0BF8A
+##### 0C7C2
+0C032		# cmplx
+0C03C		# enter lineio
+0B8C0		# on boot
+08EBA
+##### 0995E
+##### 0995E
+0B9A8
+0B9AC
+##### 0995E
+0B9B0		# on eval
+##### 0C31A
+##### 0C31A
+##### 0C31E
+?????
+0BFFE
+##### 0C836
+##### 0C836
+##### 0C836
+0BE5C
+##### 0C6DE
+0BF14
+0BF42
+0BDBE
+0BE0C
+##### 0995E
+##### 0995E
+0BF70		# on backspace
+
+# ======== Some entries generated by CasioEmu/dev-log-var-call
+# There is no further investigation what they do
+
+0586C		# on *printing* integrate in math mode
+052D2		# draw d/dx
+04F42		# draw sqrt
+
+# ======== Data labels (also see the cheat table)
+
+d_00400
+d_00694
+d_00711
+d_00762
+d_00782 # (???)
+d_007CC # (???)
+d_007E6 # (???)
+d_00AD6
+d_0080A # (???)
+d_0080B # (???)
+d_00812 # (???)
+d_00AF4
+d_00AF6
+d_0081D # (???)
+d_00AF8
+d_0081F # (???)
+d_0082C # (???)
+d_0082D # (???)
+d_0082E # (???)
+d_0082F # (???)
+d_00844 # (???)
+d_00B28
+d_00B30
+d_00B35
+d_00B3F
+d_01C64 # (???)
+d_01C6C # (???)
+d_01DB2 # (???)
+d_01DCE # (???)
+d_01DDC # (???)
+d_01DE8 # (???)
+d_01DF4 # (???)
+d_01DF6 # (???)
+d_01E24 # (???)
+d_01E5C # (???)
+d_01E86 # (???)
+d_01E88 # (???)
+d_01F74 # (???)
+d_01FB6 # (???)
+d_01FB8 # (???)
+d_02399 # (???)
+d_023C6 # (???)
+d_023C8 # (???)
+d_023C9 # (???)
+d_023D2 # (???)
+d_023D3 # (???)
+d_023D4 # (???)
+d_023D5 # (???)
+d_08000		reg0
+d_08002		reg0.2
+d_08004		reg0.4
+d_08005		reg0.5
+d_08006		reg0.6
+d_08007		reg0.7
+d_08008		reg0.8
+d_08009		reg0.9
+d_0800A
+d_0800B
+d_0800C
+d_0800D
+d_0800E
+d_0800F
+d_08010		reg1
+d_08011		reg1.1
+d_08012		reg1.2
+d_08018		reg1.8
+d_08019		reg1.9
+d_0801A
+d_0801C
+d_0801D
+d_0801E		arith_op       # (-, +, ÷, ×) = 9, 8, 7, 6
+d_0801F
+d_08020		reg2
+d_08022		reg2.2
+d_08029		reg2.9
+d_0802A
+d_0802B
+d_0802C
+d_0802D
+d_0802E
+d_0802F
+d_08030		reg3
+d_08032		reg3.2
+d_08039		reg3.9
+d_0803A
+d_0803B
+d_0803C		reg4
+d_08044		reg4.8
+d_08046		reg5
+d_0804C		reg5.6
+d_08050		reg6
+d_08052		reg6.2
+d_08059		reg6.9
+d_0805A
+d_0805B
+d_0805C		arg0_ref      # functions that manipulate numbers (such as
+d_0805E		arg1_ref      # num_add) save the arguments reference here
+d_080DC
+d_080DD		cursor_noflash
+d_080DE
+d_080DF
+d_080E0 # (???)
+d_080E1 # (???)
+d_080F2
+d_080F4
+d_080F5		last_fn_key  # example: 'sin' = A0, 'sin^-1' = B0
+d_080F7
+d_080F8		modifiers     # 08:shift,04:alpha,02:RCL,01:STO
+d_080F9		mode
+				# comp 193, cmplx 196, stat 3, basen 2, eqn 69, mat 6,
+				# table 136, vct 7, ratio 74, ineq 75, dist 12
+
+d_080FA		submode       # base-n:(base-1),ineq:(degree+1),stat:1~8,etc.
+d_080FB		screen_state  # normal: 0, mode: 1, setup: 2, hyp/deg...: 3
+d_080FC
+d_080FD
+d_080FE
+d_080FF
+d_08100
+d_08101
+d_08102		setup.number_form   # fix: 8, sci: 9, norm1: 0, norm2: 4
+d_08103		setup.num_ndigit    # for fix and sci mode (0~9)
+d_08104
+d_08105		setup.deg_form      # d: 4, r: 5, g: 6
+d_08106		setup.mthio
+d_08107
+d_08108
+d_08109		setup.stat_freq
+d_0810A		setup.rdec
+d_0810C
+d_08112		setup.contrast
+d_08113
+d_08114		cursor_pos_byte
+d_08115
+d_08116		formula_xcor
+d_08117		formula_ycor
+d_08118		cursor_xcor
+d_08119		cursor_ycor
+d_0811A
+d_0811B
+d_0811C		viewport_table  # 1 or 2 for 4-column tables
+d_0811D		row_in_table    # relative to current viewport
+d_0811E		col_in_table
+d_0811F		font_size
+d_08120		draw_mode
+				# 0: white background
+				# 4: white background (sanitize, only draw inside background)
+				# 1: transparent background
+				# 2: AND with screen
+				# 3 (otherwise): xor with screen
+
+d_08121		use_buffer   # real screen or screen buffer
+d_08124
+d_08126
+d_08127		use_output_charset
+				# example: 0x4E is '×' input but 'N' output
+d_08128
+d_08129
+d_0812A
+d_0812C		formula_ptr   # usually 0x8154
+d_0812E
+d_08130
+d_0821C		random_state  # Used in the random generator. # (???)
+d_08224		timer         # 2-byte value. Part of the random state.
+
+d_08226		var_m # (???)
+d_08230		var_ans # (???)
+d_0823A		var_a # (???)
+d_08244		var_b # (???)
+d_0824E		var_c # (???)
+d_08258		var_d # (???)
+d_08262		var_e # (???)
+d_0826C		var_f # (???)
+d_08276		var_x # (???)
+d_08280		var_y # (???)
+
+d_083FC
+d_083FD
+d_083FE
+
+d_0860E		magic_string  # 15 bytes '0f 0e 0d 0c ... 02 01', the calculator
+				# is reset on startup if this is corrupted
+
+d_087D0		screen_buffer
+d_087D1 	screen_buffer.1
+d_087D2 	screen_buffer.2
+d_087D3 	screen_buffer.3
+d_087D4 	screen_buffer.4
+d_087D5 	screen_buffer.5
+d_087D7 	screen_buffer.7
+d_087D8 	screen_buffer.8
+d_087D9 	screen_buffer.9
+d_087DA 	screen_buffer.A
+d_087DB 	screen_buffer.B
+d_08DEA # (???)
+
+d_0F000		hardware.dsr
+d_0F008
+d_0F00A
+d_0F010
+d_0F014
+d_0F018
+d_0F020		timer.interval
+d_0F022		timer.counter
+d_0F024
+d_0F025		timer.control
+d_0F030
+d_0F031
+d_0F032		screen.contrast
+d_0F033
+d_0F034
+d_0F040		keyboard.ki
+d_0F041
+d_0F042		keyboard.ki_filter
+d_0F044		keyboard.ko_mask
+d_0F045
+d_0F046		keyboard.ko
+d_0F047
+d_0F048
+d_0F049 # (???)
+d_0F221
+d_0F222
+d_0F223
+d_0F800		screen.disp
+d_0F801		screen.disp.1
+d_0F802		screen.disp.2
+d_0F80A		screen.disp.A
+d_0F80B		screen.disp.B

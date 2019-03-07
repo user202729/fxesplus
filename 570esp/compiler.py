@@ -1,7 +1,21 @@
-# Invoking this directly does nothing, instead, import this as a library.
+#!/usr/bin/python3
+import sys,os
+os.chdir(os.path.dirname(__file__))
+sys.path.append('..')
+from libcompiler import (
+		set_font, set_npress_array, get_disassembly, get_commands,
+		read_rename_list, set_symbolrepr,
+		to_font,
+		process_program
+		)
+
+get_disassembly('disas.txt')
+get_commands('gadgets')
+read_rename_list('labels')
+
 
 def get_font(filename = 'font'):
-	file = open(filename, 'r')
+	file = open(filename, 'r', encoding='utf8')
 	font = ''
 
 	for line_index, line in enumerate(file):
@@ -22,16 +36,9 @@ def get_font(filename = 'font'):
 			'16 lines')
 
 	return font
-font = get_font()
+set_font(get_font())
 
-font_assoc = dict((c,i) for i,c in enumerate(font))
-def from_font(st):
-	return [font_assoc[char] for char in st]
-def to_font(charcodes):
-	return ''.join(font[charcode] for charcode in charcodes)
-
-def get_npress(charcodes):
-	npress=(
+npress=(
 	999,4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,
 	100,100,100,100,100,100,100,100,100,100,100,100,100,4,  4,  4,
 	100,100,4,  4,  4,  2,  4,  4,  1,  1,  4,  1,  1,  1,  1,  100,
@@ -49,21 +56,7 @@ def get_npress(charcodes):
 	4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,
 	4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  100,
 	)
-	if isinstance(charcodes, int): charcodes = (charcodes,)
-	return sum(npress[charcode] for charcode in charcodes)
-
-def get_npress_adr(adrs):
-	if isinstance(adrs, int): adrs = (adrs,)
-	assert all(0 <= adr < 0x20000 for adr in adrs)
-	return sum(get_npress((adr&0xFF,(adr>>8)&0xFF)) for adr in adrs)
-
-def optimize_adr_for_npress(adr):
-	'''
-	For a 'POP PC' command, the lowest significant bit in the address
-	does not matter. This function use that fact to minimize number
-	of key strokes used to enter the hackstring.
-	'''
-	return min((adr, adr^1), key=get_npress_adr)
+set_npress_array(npress)
 
 def get_binary(filename):
 	file = open(filename, 'rb')
@@ -90,26 +83,28 @@ def get_symbols(rom):
 
 	return symbols
 symbols = get_symbols(rom)
+symbolrepr = symbols[:]
 
 consts = [*range(1,16)] + [rom[0x160E + i] for i in range(25)]
+for i,x in enumerate(consts):
+	symbolrepr[x]='cs'+str(i+1)
 convs = [*range(0xD7, 0xFF)]
+for i,x in enumerate(convs):
+	symbolrepr[x]='cv'+str(i+1)
 
-def to_key(byte):
-	try:
-		return f'cs{1+consts.index(byte)}'
-	except ValueError:
-		pass
+set_symbolrepr(symbolrepr)
 
-	try:
-		return f'cv{1+convs.index(byte)}'
-	except ValueError:
-		pass
+import argparse
 
-	return symbols[byte]
+parser = argparse.ArgumentParser()
+parser.add_argument('-t', '--target', default='overflow',
+		choices=('none', 'overflow', 'loader'),
+		help='how will the output be used')
+parser.add_argument('-f', '--format', default='key',
+		choices=('hex', 'key'),
+		help='output format')
+args = parser.parse_args()
 
-def optimize_sum_for_npress(total):
-	''' Return (a, b) such that a + b == total. '''
-	return ['0x'+hex(x)[2:].zfill(4) for x in min(
-		((x, (total-x)%0x10000) for x in range(0x0101, 0x10000)),
-		key=get_npress_adr
-	)]
+program = sys.stdin.read().split('\n')
+
+process_program(args, program, overflow_initial_sp=0x8DA4)
