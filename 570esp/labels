@@ -13,6 +13,7 @@
 02B10		basen_base_print
 02C04		num_output_print # takes num*, if == NULL then print ''
 02CE0		buffer_clear_lastnline
+02D38		buffer_clear
 02EBA		char_print       # r0: col, r1: row, r2: char
 02E78		line_print.col_0
 02E7A		line_print       # r0: col, r1: row, er2: address
@@ -28,7 +29,9 @@
 045A6		need_reset  # check magic string and various things
 .l_03C		.yes
 .l_042		.no
+045EE		shutdown
 04640		delay       # 04640
+048C2		diagnostic_mode
 04C30		hex_byte    # r0 -> 2-byte string in er0
 04E50		strcpy
 07E94		memset
@@ -43,6 +46,17 @@
 0B0C6		keypress_wait__
 0B370		char_print_real_screen__  # char(*er0) -> real screen at (*er2)
 0B45E		getkeycode
+
+08ADC		f_08ADC  # bool(void): mode == table && [80fc] == 1
+
+0B8B8		f_0B8B8  # void(byte) : param is a bitmask
+				# bit 7: keep formula (if turned off, formula at 8154 is reset)
+				# bit 0~3:
+				#   * clear screen (if all 0, not clear screen buffer)
+				#   * if !=2, not call f_0B998 (print prev result?)
+				# f_0A564: if return != 0: enter small text at bottom of screen
+0B998		f_0B998  # void(???)
+				# print output '0', unless f_08ADC or f_087BA
 1B4EA		invalid_var
 
 10FB4		table_prompt_print    # (byte row)
@@ -444,8 +458,8 @@ d_080FE
 d_080FF
 d_08100
 d_08101
-d_08102		setup.number_form   # fix/sci/norm
-d_08103
+d_08102		setup.number_form   # fix: 8, sci: 9, norm1: 0, norm2: 4
+d_08103		setup.num_ndigit    # for fix and sci mode (0~9)
 d_08104
 d_08105		setup.deg_form      # d: 4, r: 5, g: 6
 d_08106		setup.mthio
@@ -458,8 +472,8 @@ d_0810E		setup.contrast
 d_0810F
 d_08110		cursor_pos_byte
 d_08111
-d_08112		lineio_disp
-d_08113
+d_08112		formula_xcor
+d_08113		formula_ycor
 d_08114		cursor_xcor
 d_08115		cursor_ycor
 d_08116
