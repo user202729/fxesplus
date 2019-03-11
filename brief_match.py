@@ -1,5 +1,10 @@
 #!/bin/python3
 '''
+NOTE:
+	Checkout branch `faster-briefmatch` for a faster implementation, and an
+	implementation in C++.
+	However that is not very carefully tested.
+
 Find a snippet of code in another file, using "disassembly brief form".
 
 To create input files: disassemble using disas/nX-U8_brief.txt.
