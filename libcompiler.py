@@ -95,14 +95,12 @@ def add_command(command_dict, address, command, tags, debug_info=''):
 		f'Command contains ";" {debug_info}'
 
 	# this is inefficient
-	prev_command = command_dict.get(command, None)
-	for adr, tags in command_dict.values():
-		if adr == address:
-			prev_command = (adr, tags)
-			break
-	assert prev_command is None, f'Command {command} appears twice - ' \
-		f'first: {prev_command[0]:05X} {prev_command[1]}, ' \
-		f'second: {address:05X} {tags},' \
+	for prev_command, (prev_adr, prev_tags) in command_dict.items():
+		if prev_command == command or prev_adr == address:
+			assert False, f'Command appears twice - ' \
+				f'first: {prev_command} -> {prev_adr:05X} {prev_tags}, ' \
+				f'second: {command} -> {address:05X} {tags} - ' \
+				f'{debug_info}' \
 
 	command_dict[command] = (address, tuple(tags))
 
@@ -123,7 +121,7 @@ def get_commands(filename):
 
 	in_comment = False
 	line_regex = re.compile('([0-9a-fA-F]+)\s+(.+)')
-	for line_index, line in enumerate(data):
+	for line_index0, line in enumerate(data):
 		line = line.strip()
 
 		# multi-line comments
@@ -148,7 +146,7 @@ def get_commands(filename):
 		while command and command[0] == '{':
 			i = command.find('}')
 			if i < 0:
-				raise Exception(f'Line {line_index} '
+				raise Exception(f'Line {line_index0+1} '
 					'has unmatched "{"');
 			tags.append(command[1:i])
 			command = command[i+1:]
@@ -156,9 +154,9 @@ def get_commands(filename):
 		try:
 			address = int(address, 16)
 		except ValueError:
-			raise Exception(f'Line {line_index} has invalid address: {address!r}')
+			raise Exception(f'Line {line_index0+1} has invalid address: {address!r}')
 
-		add_command(commands, address, command, tags, f'at {filename}:{line_index}')
+		add_command(commands, address, command, tags, f'at {filename}:{line_index0+1}')
 
 def get_disassembly(filename):
 	'''Try to parse a disassembly file with annotated address.
@@ -196,7 +194,7 @@ def read_rename_list(filename):
 	hexadecimal  = re.compile(r'[0-9a-fA-F]+')
 
 	last_global_label = None
-	for line_index, line in enumerate(data):
+	for line_index0, line in enumerate(data):
 		match = line_regex.match(line)
 		if not match: continue
 		raw, real = match[1], match[2]
@@ -249,7 +247,8 @@ def read_rename_list(filename):
 					note(f'Warning: Duplicated command {real}\n')
 					continue
 
-			add_command(commands, addr, real, tags=tags, debug_info=f'at {filename}:{line_index}')
+			add_command(commands, addr, real, tags=tags,
+					debug_info=f'at {filename}:{line_index0+1}')
 		else:
 			raise ValueError('Invalid line: ' + repr(line))
 
