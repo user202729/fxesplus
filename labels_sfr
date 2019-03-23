@@ -10,10 +10,17 @@ d_0F020		timer.interval
 d_0F022		timer.counter
 d_0F024
 d_0F025		timer.control
-d_0F030
+d_0F030		screen.range  # specify that only N first rows of the screen are displayed
+				# Value: (0..7) -> N = (31, 15, 19, 23, 27, 27, 9, 9)
+				# Only 3 lowest bits have value. Excludes the status bar.
+				# The fewer lines the screen displays, the darker the contrast is.
 d_0F031		screen.mode
-d_0F032		screen.contrast
-d_0F033
+				# Only 3 lowest bits have value. 0,1,2,3,7: screen off
+				# 4: white screen, 5: normal screen
+				# 6: "computing" screen (low contrast white with status bar)
+d_0F032		screen.contrast  # 5 bits, value 0x00 .. 0x1F
+d_0F033		screen.contrast2  # 3 bits, value 0..7
+				# lower value = darker screen. works independently with [F032].
 d_0F034
 d_0F040		keyboard.ki
 d_0F041
