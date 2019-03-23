@@ -31,24 +31,42 @@
 .l_042		.no
 045EE		shutdown
 04640		delay       # 04640
-048C2		diagnostic_mode
+
+# functions used in diagnostic mode
+048C2		diagnostic_mode  # display "DIAGNOSTIC / Press AC" text
+048F6		diagnostic
+04986		diag_check_key
+049F2		line_print_small  # r0: row
+04A02		diag_scr_fill_ws  # fill value in r0, then wait for shift
+04A10		diag_scr_ckb1_ws  # 2 checkerboard patterns
+04A30		diag_scr_ckb2_ws
+04A58		diag_scr_box_ws
 04C30		hex_byte    # r0 -> 2-byte string in er0
+04C9E		render_waitshift
+
 04E50		strcpy
 07E94		memset
 07EF6		memcpy
 08B82		strlen
 08BA0		strchr
+08FA2		set_contrast  # bool r0: diagnostic mode?
 096E8		far_call_stub  # it's likely that the compiler auto generate
 				# this to call far function pointer
 096EA		strcat
 0AEFA		table_home  # go to row 1 col 1 of table
 0AFB0		reset_all
-0B0C6		keypress_wait__
+0B0C6		getscancode  # void (keyinfo* er0)
+				# where keyinfo = struct { char ki; char ko; }
 0B370		char_print_real_screen__  # char(*er0) -> real screen at (*er2)
-0B45E		getkeycode
+0B45E		getkeycode  # handle modifier keys
+				# (for example shift+1 has different keycode from 1)
 
 08ADC		f_08ADC  # bool(void): mode == table && [80fc] == 1
 
+0B410		scancode_to_int  # int (keyinfo const* er0, char* lookuptable)
+				# usually this function is used after getscancode
+
+0B654		wait_shift
 0B8B8		f_0B8B8  # void(byte) : param is a bitmask
 				# bit 7: keep formula (if turned off, formula at 8154 is reset)
 				# bit 0~3:

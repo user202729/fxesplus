@@ -91,5 +91,3 @@ Allowed tags:
 
 04CE8		{RT} memmove                     # similar to memcpy
 				# er0 <- er2. Call 4e50. Do nothing if er2 == 0.
-
-0B656		{Del LR} wait for key
