@@ -12,6 +12,7 @@ from libcompiler import (
 get_disassembly('disas.txt')
 get_commands('gadgets')
 read_rename_list('labels')
+read_rename_list('../labels_sfr')
 
 
 font='''

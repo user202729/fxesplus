@@ -1,0 +1,34 @@
+# Special function registers (SFR) for ES PLUS calculator model.
+
+d_0F000		hardware.dsr
+d_0F008
+d_0F00A
+d_0F010
+d_0F014
+d_0F018
+d_0F020		timer.interval
+d_0F022		timer.counter
+d_0F024
+d_0F025		timer.control
+d_0F030
+d_0F031		screen.mode
+d_0F032		screen.contrast
+d_0F033
+d_0F034
+d_0F040		keyboard.ki
+d_0F041
+d_0F042		keyboard.ki_filter
+d_0F044		keyboard.ko_mask
+d_0F045
+d_0F046		keyboard.ko
+d_0F047
+d_0F048
+d_0F049
+d_0F221
+d_0F222
+d_0F223
+d_0F800		screen.disp
+d_0F801		screen.disp.1
+d_0F802		screen.disp.2
+d_0F80A		screen.disp.A
+d_0F80B		screen.disp.B
