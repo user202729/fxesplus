@@ -12,5 +12,5 @@ $cmd CasioEmu/disassembler/disassembler.lua \
 	output='82espa/disas.txt' \
 	entry='1,2,4,5,6,7,8,9,10,11,12,13,14,15,16' \
 	strict='true' addresses='true' rom_window='0x8000' \
-	# names='570esp/labels' \
+	names='82espa/labels' \
 	"$@"
