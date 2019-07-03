@@ -1,0 +1,119 @@
+<!--
+A tool to convert from ASCII format to calculator font and bytes.
+Currently only 1-byte characters are supported.
+Usage:
+	Set background-image of renderchar to correct file path. (can be generated with
+		`to_png.py`)
+	Modify the character name list (optional)
+	Enter text (character names separated by space) into the first text box.
+Output:
+	* render div: Image of the characters.
+	* output text area: hexadecimal format. May be AA|BB for ambiguous characters,
+	#[input] for invalid character name, or ?? for '' or '??' in input.
+	* suggestion list: a list of character names containing the typed word. Only work
+	if the entered word is the last one.
+-->
+
+<script>
+const D=[
+	"nul","","","","","","","","","","","","","","","",
+	"xx","yy","zz","...","+^","+v","s>","s_","$","<|","&","it","_T","_t","_h","_5",
+	"space","!",'"',"#","**","%","//","'","(",")","*.","+",",","--",".","/",
+	"0","1","2","3","4","5","6","7","8","9",":",";","<","=",">","?",
+	"@","A","B","C","D","E","F","G","H","I","J","K","L","M","N","O",
+	"P","Q","R","S","T","U","V","W","X","Y","Z","[","sqrd","]","^","_",
+	"neg","a","b","c","d","e","f","g","h","i","j","k","l","m","n","o",
+	"p","q","r","s","t","u","v","w","x","y","z","{","|","}","~","|-",
+	"ii","ee","_x>","_10","_inf","deg","rad","gra","angle","x-","y-","x^","y^","->","Prod","=>",
+	"_x<","__10","__10-","_|","<=","!=",">=","downwhite","sqrt","int","_A","_B","_C","_n","+>","<+",
+	"^0","^1","^2","^3","^4","^5","^6","^7","^8","^9","^-1","^x","^10","_(","_)","_+-",
+	"_0","_1","_2","_-1","_F","_N","_P","_mu","AAA","BBB","CCC","DDD","EEE","FFF","PPP","|>",
+	"Sigma","alpha","gamma","eps","theta","lam","mu","pi","sigma","phi","lit","h/","[#]","[]","_3","_bold",
+	"ff","pp","nn","Bmu","mm","kk","MM","GG","TT","PP","EE","iF","_p","_e","_J","_K",
+	"_tau","_u","_9","_Ao","_m","_I","_4","cut","copy","_L","undo","up","^n",
+]
+</script>
+
+<style>
+#input,#output{
+	width: 100%;
+}
+
+#render{
+	height:17px;
+}
+
+.renderchar{
+	display:inline-block;
+	width:11px;
+	height:17px;
+	background-image:url('../../580vnx/img/font.png');
+}
+</style>
+
+<textarea id=input autofocus></textarea>
+<div id=render></div>
+<textarea id=output></textarea>
+<div id=complist></div>
+
+<script>
+	// str -> possible byte values (hex)
+	const BYTES=Object.create(null)
+
+	for(let i=0;i<D.length;++i){
+		let d=D[i]
+		if(d.includes(' '))
+			throw Error(`${i} -> ${d} is invalid: contains space`)
+		let i_hex=i.toString(16).padStart(2,'0')
+		if(d in BYTES)
+			BYTES[d]+='|'+i_hex
+		else
+			BYTES[d]=i_hex
+
+		let a=document.createElement('div')
+		a.style.display='none'
+		a.textContent=d
+		complist.appendChild(a)
+	}
+
+	BYTES['']='??'
+	if('??' in BYTES)
+		throw Error(`?? is invalid`)
+	BYTES['??']='??'
+
+
+	input.oninput=_=>{
+		let val=input.value
+
+		let bytes=val.split(' ').map(x=>x in BYTES?BYTES[x]:`#[${x}]`)
+		;[...render.childNodes].forEach(x=>render.removeChild(x))
+		for(let x of bytes){
+			const rowsize=17,colsize=11
+			x=parseInt(x,16)
+			if(isNaN(x))
+				continue
+			let row=x>>4,col=x&15
+			let a=document.createElement('span')
+			a.classList.add('renderchar')
+			// there are 5 initial cols for address
+			a.style.backgroundPosition=`${-(col+5)*colsize} ${-row*rowsize}`
+			render.appendChild(a)
+		}
+
+		output.value=bytes.join(' ')
+
+		if(input.selectionEnd!=val.length){
+			[...complist.childNodes].forEach(x=>x=x.style.display='none')
+			return
+		}
+
+		let match=/.* (.*)/.exec(val),lastword
+		if(match===null)
+			lastword=val
+		else
+			lastword=match[1]
+
+		;[...complist.childNodes].forEach(x=>x=x.style.display=(
+			x.textContent.includes(lastword)?'':'none'))
+	}
+</script>
