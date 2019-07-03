@@ -41,6 +41,7 @@
 04A10		diag_scr_ckb1_ws  # 2 checkerboard patterns
 04A30		diag_scr_ckb2_ws
 04A58		diag_scr_box_ws
+04A9E		diag_checksum
 04C30		hex_byte    # r0 -> 2-byte string in er0
 04C9E		render_waitshift
 
@@ -195,7 +196,13 @@
 0454E		st_var    # void (int8_t var_index, cmplx* src)
 044EE		l_var     # void (int8_t var_index, cmplx* dest)
 
-1B0A8		num_cmp     # 2 if n0<n2, 1 if n0==n2, 4 if n0>n2
+1B0A8		num_cmp       # 2 if n0<n2, 1 if n0==n2, 4 if n0>n2 (n0 = num [ER0])
+1743C		num_cmp_reg01
+.l_04C		.ret_04
+.l_04E		.ret
+.l_050		.ret_01
+.l_054		.ret_02
+.l_058		.ret_f0
 085EC		num_to_str      # char num_to_str(num const*, char*)
 1B48A		num_cpy
 
@@ -208,6 +215,15 @@
 1AA28		num_mul_1
 1AA14		num_div_1
 16EA2		cmplx_square_1  # have er2 == er0 when calling
+
+1A362		reg0_lt_reg1_abs  # change sign of reg1 to reg0 then return (|reg0| < |reg1|)
+.l_026		.reg01_diffsign  # [800A] = 6
+.l_080		.reg01_samesign  # [800A] = 0
+.l_012		.ret_0
+.l_074		.ret_0_
+.l_078		.ret_1
+.l_07C		.reg0_neg
+
 
 19F28		l_regs          # Load register from argument
 19F30		l_reg0
@@ -244,12 +260,7 @@
 132EC		num_normalize     # set 2 last bytes to '99 00' <-> multiply by a
 				# power of 10 to make it a value to a number in [0.1, 1[
 
-1743C		num_compute_header__
-.l_04C		.ret_04
-.l_04E		.ret
-.l_050		.ret_01
-.l_054		.ret_02
-.l_058		.ret_f0
+1A3E6		set_reg0_error  # F3 00..
 173C0		set_reg1_10
 173D6		set_reg1_100d9    # 100/9 = 11.1111...
 173F0		set_reg1_1d10     # 1/10 = 0.1
