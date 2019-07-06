@@ -7,4 +7,5 @@ CasioEmu/emulator/bin/casioemu \
 	model=CasioEmu/models/fx570esplus/ \
 	script=570esp/lua-emu-init.lua \
 	history=570esp/.emu_history \
+	exit_on_console_shutdown=true \
 	"$@"
