@@ -1,0 +1,18 @@
+17B34	pop xr0
+176d4	[er2] = r0, r2 = 0
+203c8	smart_strcpy_nn_  # after push lr
+
+203D2	[er0] = r2
+23f9e	calc_checksum_set_f004
+23fa6	calc_checksum_no_set_f004  # note: also not set er8
+# actually 23fac
+23fad	calc_checksum_0   # freeze for some reason!?
+23fc0	calc_checksum_1
+23fd4	calc_checksum_2
+23fea	calc_checksum_3
+23f21	pr_checksum
+09ca0	[er8] += er2, pop xr8
+0a910	mov sp, er14, pop er14, rt
+0a912	pop er14, rt
+2400c	pop qr8
+0a8a8	nop

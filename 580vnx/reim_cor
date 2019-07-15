@@ -1,0 +1,176 @@
+'.': tested but not sure
+'?': prediction
+
+re	im	ofs	cont.
+
+=== DATA ===
+3032	307b.	49	_| 9 angle _A ^9 <| #
+8972	8b24	1b2	n space 1 ~ 4
+
+=== CODE ===
+
+
+9b28.	9ce0	1b8	010010110111000100011100110010010101001010010100
+9ca0.	9e58	1b8.	gadget: [er8] += er2
+9ca8	9e60	1b8	10001110111100100000000011100010000000100000000011111010
+
+	a376
+
+?	a342	?	function use segment 4
+?	a392	?	function use segment 4
+
+a228			
+a248	a5e8??	3a0?	000111101111100010001110111100101100111011111
+
+a268	a454.	1ec	11100100110111000110010111110000000000011111000110000010100010010000010000000010010001011111000000
+
+a368	a554	1ec	00111100110011100000000111110010100001100111111000011100
+a36a	a556	1ec	ref to a seg2 func
+
+a4f5?	a6ec	1f7?	<bl line_print>
+a501	??		?? => nul
+
+a8a5 (= **)		(F01F) ? ? [AA99] _) n 
+a8aa	aa96	1ec	memmove_nn (//R **)
+a8c0	aaac	1ec	B _0 // ?? ?? theta E ?? _2 // ?? ?? ?? ?? ?? _3 ??
+
+a912?	aafe	1ec?	pop er14 / rt  [FAIL?]
+
+
+
+ae30	??		?? sigma } ff p ?? sigma | _0 ... _x< P pp ?? ?? gamma _3
+ae40	??		gamma _3 | _0 ^y/ nul
+
+
+c0c0	c294	1d4	7 pp xx _x< yy pp ?? p " sigma _I ?? zz ?? xx _x< zz
+c0e6	c2ba	1d4	h nul
+
+c120	c2f6	1d6	00010000100100000011011011010001 0000
+c140	????	???	110111101111111100000001111100100100011000001100000000111100111000000000111000
+
+????	c354		ref to a _fn function may not exist :(
+
+c160	c37c	21c	100000101100000011001110111110000000000111110000001100001010110000000101111110000010010111111010010100001101
+c180	c39c	21c	0000000111110010101110000000111010000101 1111
+c2d6.	c4f2	21c.	...110001000000011010100110100..00000001111100100101111010000000
+c628	c844	21c	11011111110011101100111011111000000000011111000000110000101011001000000011
+
+
+
+			xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|32
+
+c768	c994	22c	0100100010010000110011100001101100000001111100001111011010010110000000101110000100001110000000000001000110010000
+????	c9d6	???	ref to a _fn function - not exist!?
+c7b8???	c9e4	22c???	overlap with below
+
+
+c784?	c9e8	264?
+c7a8	ca0c	264	00000111111100101111011011000010
+
+c818	ca34?		0101111011110000110101000000000001011001
+c838	ca9c|cb2a	264|2f2	0000000000000001000000011111001010011110101011000000000100000011000000010000001011100101111100001101101011100
+
+c9d8	cc3c?		100100001100100011001110111110000001000000000000000100001101000110001000011100000001011111001000000000010000000000000001111100100000011010110100010010000000001011010010000000111000000000000000
+c9f8	cc5c?		010000001101001000000000011100000000100011001001001000
+ca38	cc9c	264	000111100111000011111100010100010000001111001001001
+
+
+
+23ca8	23c9c	-c	delay 10d, pop xr0, pc (** CC)
+
+23d0a	23cfe	-c	ref line_print
+
+23d52.	23d46	-c	pop 4byte,qr8,xr4,pc
+23d54.	23d48	-c	pop qr8,xr4,pc <HARD TO TYPE>
+
+23dde	23dd2	-c	ref waitshift in diag_fill/checkerboard
+
+About checksum function:
+
+23ec0			frz
+
+23ee4			frz  } -> outside of the checksum function
+23ee6			frz  }
+
+
+	pop qr8                        ; 23D48 | F83E
+
+23e66	23e5a   -c?	pop qr8,pc <CANT TYPE>
+
+23e6a	23e5e	-c	diag_version
+23e6c	23e60	-c	(sinh EE 2 0) -> show version and pop 0/8 bytes bf ret
+23e6e	23e62	-c	(tanh EE 2 0) -> show version and pop 4 bytes bf ret
+
+23e8c?	23e80	-c?	pop qr8,xr4,pc <CANT TYPE>
+
+
+XX 23efc/d			frz
+XX 23efe			ok
+XX 23f00/1			frz
+XX 23f02			frz
+XX 23f04
+XX 23f06			ok  -> even with set er14 is still doesn't print. After store?
+XX 23f08			frz
+XX 23f0a			ok
+XX 23f0c			frz
+XX 23f0e
+XX 23f10			frz } -> ???? how?
+XX 23f12			frz }
+
+PROBLEM for freeze: incorrect er14 value.
+
+203c2.	203c2	0.	smart_strcpy_nn
+23efc	23ef0	-c
+
+2400c	24000	-c	sh822|pop qr8,pc
+2400e	24002	-c	sh832|pop pc
+
+
+27e86	283d4	54e	
+?????	28406	???	memcpy_fn : difference between 2 delta = len of fn = 44 !!??
+2805e	285f0	592
+
+2c240??	2E1C8		ref at im 0CC5A
+
+===========================
+
+Possible loc for set sp
+
+
+a910?	1ec?
+00AAFC   EA A1              MOV     SP, ER14
+00AAFE   1E FE              POP     ER14
+00AB00   1F FE              RT
+
+???
+00AE24   EA A1              MOV     SP, ER14
+00AE26   2E F4              POP     XR4
+00AE28   3E F8              POP     QR8
+00AE2A   8E F2              POP     PC
+
+???
+00DEB2   EA A1              MOV     SP, ER14
+00DEB4   1E FE              POP     ER14
+00DEB6   1F FE              RT
+
+23e8a	-c
+023E7E   EA A1              MOV     SP, ER14
+023E80   3E F8              POP     QR8
+023E82   2E F4              POP     XR4
+023E84   8E F2              POP     PC
+
+23f82	-c
+023F76   EA A1              MOV     SP, ER14
+023F78   3E F8              POP     QR8
+023F7A   3E F0              POP     QR0
+023F7C   8E F2              POP     PC
+
+24066.	-c.
+02405A   EA A1              MOV     SP, ER14
+02405C   3E F8              POP     QR8
+02405E   8E F2              POP     PC
+
+===========================
+
+
+vim: ts=8 sw=8 noet nowrap

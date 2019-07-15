@@ -1,0 +1,56 @@
+# Library builtins and BL-able addresses (functions).
+# Also contains data labels.
+# Does NOT include gadgets.
+
+# Arguments are 0-indexing.
+# All lines with '#' won't match the Lua pattern so they're effectively
+# comments. Comment for something is put **after** it.
+
+# ========= Library function
+
+0E862		strcpy_nn
+???????		strcat_nn
+29F36		strlen_f
+???????		memset_f
+???????		memcpy_nf
+2F982		strcat_fn
+27548		memcpy_nn
+0AA96		memmove_nn
+28406		memcpy_fn
+2A0F2		strlen_n
+???????		abs
+0DE82		strcpy_fn
+???????		memset_n
+
+# ========= Smart functions (special case NULL)
+
+203C2		smart_strcpy_nn
+# copy to NULL = no-op, copy from NULL = ""
+203B8		smart_strlen_n
+# len(NULL) == 0
+
+265C8		reset_routine
+# I think so
+25058		get_string_constant
+# It appears that only [0xd12b]==0 makes sense
+# Run `extract-table.py`. Decompiled.
+2B5DA		f_2CFE0
+.l_030		get_string_and_length
+# from string index
+08DBE		clear_screen
+090B4		str_decompress_print
+
+0A0F2		delay
+
+0A3B8		_start
+29A7C		main
+
+095F2		buf1_to_buf2
+0960A		buf2_to_buf1
+# copy between the two screen buffers (1 at 0xDDD4, 2 at 0xE3D4)
+
+2B1D2		byte_strlen_n # strlen, but returns byte
+
+# ========= Real specific functions (KI/KO)
+
+0A322		zero_KO

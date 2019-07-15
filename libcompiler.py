@@ -2,6 +2,9 @@ import re
 import sys
 from functools import lru_cache
 
+# max_call_adr = 0x1ffff
+max_call_adr = 0x3ffff
+
 def set_font(font_):
 	global font, font_assoc
 	font = font_
@@ -26,6 +29,10 @@ def byte_to_key(byte):
 	if byte==0:
 		return '<NUL>'
 
+	# TODO hack for classwiz without unstable
+	sym=symbolrepr[byte]
+	return f'<{byte:02x}>' if sym in ('@','') else sym
+
 	offset=0
 	sym=symbolrepr[byte]
 	while byte and npress[byte]>=100:
@@ -48,7 +55,7 @@ def get_npress(charcodes):
 
 def get_npress_adr(adrs):
 	if isinstance(adrs, int): adrs = (adrs,)
-	assert all(0 <= adr < 0x20000 for adr in adrs)
+	assert all(0 <= adr <= max_call_adr for adr in adrs)
 	return sum(get_npress((adr&0xFF,(adr>>8)&0xFF)) for adr in adrs)
 
 def optimize_adr_for_npress(adr):
@@ -226,7 +233,11 @@ def read_rename_list(filename):
 			else:
 				match = local_regex.fullmatch(raw)
 				if match:
-					addr = last_global_label + int(match[1], 16)
+					if last_global_label is None:
+						print('Label cannot be read: ', line)
+						continue
+					else:
+						addr = last_global_label + int(match[1], 16)
 
 		if addr is not None:
 			assert addr < len(disasm), f'{addr:05X}'
@@ -305,7 +316,7 @@ def process(line):
 				if tag.startswith('warning'):
 					note(tag+'\n')
 
-		assert 0 <= adr < 0x20000, f'Invalid address: {adr}'
+		assert 0 <= adr <= max_call_adr, f'Invalid address: {adr}'
 		adr = optimize_adr_for_npress(adr)
 		process(f'0x{adr+0x30300000:0{8}x}')
 
@@ -320,7 +331,7 @@ def process(line):
 		line = line[6:].strip()
 		if line[0] == '[':
 			i = line.index(']')
-			offset = int(line[1:i])
+			offset = int(line[1:i],0)
 			label = line[i+1:].strip()
 		else:
 			offset = 0
@@ -401,11 +412,15 @@ def process_program(args, program, overflow_initial_sp):
 			note_log += st
 
 		old_len_result = len(result)
-		process(line)
+		try:
+			process(line)
+		except:
+			note_(f'While processing line\n{input_line}\n')
+			raise
 
 		# labels have undetermined value and they are temporarily represented
 		# by zeroes in result list
-		if args.target == 'overflow' and args.format == 'key' and \
+		if args.format == 'key' and \
 				any(x != 0 and get_npress(x) > 10 for x in result[old_len_result:]):
 			note('Line generates many keypresses\n')
 
@@ -473,17 +488,22 @@ def process_program(args, program, overflow_initial_sp):
 	for label, home_offset in labels.items():
 		note(f'Label {label} is at address {home+home_offset:04X}\n')
 
-	# scroll it around (use the most inefficient way)
-	hackstring = list(map(ord,'1234567890'*10)) # but still O(n)
-	for home_offset, byte in enumerate(result):
-		assert isinstance(byte, int), (home_offset, byte)
-		hackstring[(home+home_offset-0x8154)%100] = byte
+	if args.target == 'overflow':
+		# scroll it around (use the most inefficient way)
+		hackstring = list(map(ord,'1234567890'*10)) # but still O(n)
+		for home_offset, byte in enumerate(result):
+			assert isinstance(byte, int), (home_offset, byte)
+			hackstring[(home+home_offset-0x8154)%100] = byte
 
 	# done
 	if args.target == 'overflow' and args.format == 'hex':
 		print(''.join(f'{byte:0{2}x}' for byte in hackstring))
 	elif args.target == 'none' and args.format == 'hex':
 		print('0x%04x:'%home, *map('%02x'.__mod__, result))
+	elif args.target == 'none' and args.format == 'key':
+		print(f'{home:#06x}:', ' '.join(
+			byte_to_key(byte) for byte in result
+			))
 	elif args.target == 'loader' and args.format == 'key':
 		# NOTE: loader target may be specific to 570es+/991es+
 		print('%s %s:'%(byte_to_key((home - home2) & 255), byte_to_key((home - home2) >> 8)))
