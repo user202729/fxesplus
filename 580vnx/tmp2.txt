@@ -4,14 +4,13 @@ i=0xd180 for j=1,110 do data[i]=0x30 i=i+1 end data[i]=0xfd data[i+1]=0x20
 
 -- NOTE check if er14 should be set
 
-
-i=0xd180 for j=1,32 do data[i]=0x30 i=i+1 end -- start ER14
-
-i=0xd180 for j=1,34 do data[i]=0x30 i=i+1 end -- start PC pop adr
-for j in (' 52 a7 30 30 92 3f 32 30 31 32 33 34 35 36 fe 01 a0 3f 32 30 30 30 30 30 30 30 74 d5 14 3f 32 30 2e 2e 2e 2e 2e 2e 2e 2e 2e 2e 2e 2e 2e 2e 2e 2e 30 30 30 30 30 30 30 30 2c d5 52 d2 30 30 30 30 c8 03 32 30 01 40 32 30 c0 d2 30 30 30 30 30 30 58 9e 30 30 30 30 31 fe fe aa 30 d0 52 d5 52 a7 30 30 fc aa 30 d0 '):gmatch('%w%w') do data[i]=tonumber(j,16) i=i+1 end
-
+-- 0x3a2: diff input and undo
+i=0xd180 for j=1,34 do data[i]=0x30 i=i+1 end
+i=-0x3a2+0xd53e for j in ('50 d5 33 31 30 32 ad 7c 31 30 22 a2 30 30 33 32 31 30 39 38 37 36 35 34 33 32 31 30 30 31 60 fe 01 fe 01'):gmatch('%w%w') do data[i]=tonumber(j,16) i=i+1 end
 while i<0xd247 do data[i]=48 i=i+1 end -- fill to end
 
+
+b(0xa222)
 b(0x23f7c) -- end of checksum
 -- b(0x23fc8) -- start
 b(0x203D0) -- end of strcpy (NOTE: skip first time)
