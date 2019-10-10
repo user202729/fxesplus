@@ -6,7 +6,8 @@ i=0xd180 for j=1,110 do data[i]=0x30 i=i+1 end data[i]=0xfd data[i+1]=0x20
 
 -- 0x3a2: diff input and undo
 i=0xd180 for j=1,34 do data[i]=0x30 i=i+1 end
-i=-0x3a2+0xd53e for j in ('50 d5 33 31 30 32 ad 7c 31 30 22 a2 30 30 33 32 31 30 39 38 37 36 35 34 33 32 31 30 30 31 60 fe 01 fe 01'):gmatch('%w%w') do data[i]=tonumber(j,16) i=i+1 end
+i=-0x3a2+0xd53e
+i=0xd180 for j in ('34 7b 31 30 e2 30 31 32 dc e5 31 30 30 30 33 30'):gmatch('%w%w') do data[i]=tonumber(j,16) i=i+1 end
 while i<0xd247 do data[i]=48 i=i+1 end -- fill to end
 
 
