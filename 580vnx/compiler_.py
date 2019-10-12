@@ -10,6 +10,8 @@ from libcompiler import (
 		)
 
 get_commands('gadgets')
+read_rename_list('labels')
+read_rename_list('../labels_sfr')
 
 FONT=[l.split('\t') for l in '''
 															
