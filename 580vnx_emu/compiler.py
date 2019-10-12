@@ -53,6 +53,7 @@ npress=( # 99: nul, 49: not typeable, 24: can be extracted from multibyte charac
 	1 ,49,49,49,49,49,49,49,1 ,1 ,2 ,49,49,49,49,49,
 	1 ,49,49,49,1 ,1 ,2 ,2 ,2 ,3 ,3 ,3 ,1 ,3 ,3 ,3 ,
 	3 ,3 ,3 ,3 ,3 ,3 ,3 ,3 ,49,49,49,49,49,49,49,49,
+	49,49,49,49,49,49,49,49,49,49,49,49,49,49,49,49, # TODO fix npress table for multibyte characters
 	)
 set_npress_array(npress)
 
