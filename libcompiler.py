@@ -515,3 +515,85 @@ def process_program(args, program, overflow_initial_sp):
 		print(' '.join(byte_to_key(x) for x in hackstring))
 	else:
 		raise ValueError('Unsupported target/format combination')
+
+rom=None
+def get_rom(x):
+	global rom
+
+	if isinstance(x,str):
+		with open(x,'rb') as f:
+			rom=f.read()
+	elif isinstance(x,bytes):
+		rom=x
+	else:
+		raise TypeError
+
+def find_equivalent_addresses(rom:bytes,q:set):
+	# handles BL / POP PC, BC AL, B
+	from collections import defaultdict
+	comefrom=defaultdict(list) # adr -> list of comefrom addresses
+
+	for i in range(0,len(rom),2): # BC AL
+		if rom[i+1]==0xce:
+			offset=rom[i]
+			if offset>=128:offset-=256
+			comefrom[i>>16 | ((i+(offset+1)*2)&0xffff)].append(i)
+
+	for i in range(0,len(rom)-2,2): # B
+		if (
+				rom[i]         ==0x00 and
+				(rom[i+1]&0xf0)==0xf0):
+			comefrom[(rom[i+1]&0x0f)<<16 | rom[i+3]<<8 | rom[i+2]].append(i)
+
+	for i in range(0,len(rom)-4,2): # BL / POP PC
+		if (
+				rom[i]         ==0x01 and
+				(rom[i+1]&0xf0)==0xf0 and
+				(rom[i+4]&0xf0)==0x8e and
+				(rom[i+5]&0xf0)==0xf2):
+			comefrom[(rom[i+1]&0x0f)<<16 | rom[i+3]<<8 | rom[i+2]].append(i)
+
+	ans=set()
+	while q:
+		adr=q.pop()
+		if adr in ans:
+			continue
+		ans.add(adr)
+
+		if adr in comefrom:
+			q.update(comefrom[adr])
+
+	return ans
+
+def optimize_gadget_f(rom:bytes,gadget:bytes)->set:
+	assert len(gadget)%2==0
+	q=set() # pending addresses
+
+	# find occurences of gadget in rom
+	for i in range(0,len(rom)-len(gadget)+1,2):
+		if rom[i:i+len(gadget)]==gadget:
+			q.add(i)
+
+	return find_equivalent_addresses(rom,q)
+
+def optimize_gadget(gadget:bytes)->set:
+	global rom
+	return optimize_gadget_f(rom,gadget)
+
+# helper function for printing gadget addresses
+def print_addresses(adrs,n_preview:int):
+	adrs=list(map(optimize_adr_for_npress,adrs))
+	for adr in sorted(adrs,key=get_npress_adr):
+		keys=' '.join(map(byte_to_key,
+			(adr&0xff,(adr>>8)&0xff,0x30|adr>>16)
+			))
+		print(f'{adr:05x}  {get_npress_adr(adr):3}    {keys:20}')
+		
+		i=adr&0xffffe
+		for _ in range(n_preview):
+			print(' '*4 + disasm[i])
+			i+=2
+			while i<len(disasm) and not disasm[i]:
+				i+=2
+			if i>=len(disasm):
+				break

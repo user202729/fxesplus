@@ -1,6 +1,5 @@
-17B34	pop xr0
 176d4	[er2] = r0, r2 = 0
-203c8	smart_strcpy_nn_  # after push lr
+203c8	smart_strcpy_nn_  # after push lr # expensive
 
 203D2	[er0] = r2
 23f9e	calc_checksum_set_f004
@@ -12,7 +11,49 @@
 23fea	calc_checksum_3
 23f21	pr_checksum
 09ca0	[er8] += er2, pop xr8
-0a910	mov sp, er14, pop er14, rt
-0a912	pop er14, rt
-2400c	pop qr8
+143d0	{del lr} memzero_
+2702e	mov sp, er14, pop er14, rt
+27030	pop er14, rt
+
+24836	mov sp, er14, pop xr4, pop qr8 # LEAVE
+12da6	mov sp, er14, pop qr8
+
 0a8a8	nop
+
+13332	pop er0, rt   #  2    2 3 1
+18974	pop er2       #  3    √( LCM( 1
+250a6	pop er4       #  3    + Σ( 2
+0a8a6	pop er8       #  2    + × 0
+16eca	pop er12, rt  #  5    ˣ√( tanh( 1
+17bda	pop qr0       #  5    ʳ cos⁻¹( 1
+12da8	pop qr8       #  2    × x⏨ 1
+177da	pop r0        #  4    ʳ sin( 1
+1844a	pop r8        #  4    PreAns Intg( 1
+17b34	pop xr0       #  3    4 cos⁻¹( 1
+1d040	pop xr4       #  3    M ) 1
+183a6	pop xr8       #  3    + Int( 1
+
+# expensive
+
+0d516	pop er10      # 25    <16> ² 0
+0d04c	pop r12       # 25    θ ) 0
+
+12602	pop er0       # 48    <02> <26> 1
+21636	pop er12      # 25    6 <16> 2
+15c78	pop er14      # 25    cos( <5c> 1
+13ab0	pop er6       # 73    <b0> 𝐀 1
+1dcf6	pop er6, rt   # 50    <f6> ▫ 1
+20730	pop xr12      # 25    0 <07> 2
+
+# Likely suboptimal
+
+16d88	pop er4, rt   #  5    GCD( cosh( 1
+16d7c	pop er8, rt   #  5    tan⁻¹( cosh( 1
+17072	pop qr0, rt   #  5    𝐞^( cosh⁻¹( 1
+14c50	pop qr8, rt   # 26    Σ( θ 1
+15fc0	pop r4        # 50    - <5f> 1
+16210	pop r4, rt    # 73    <10> Q( 1
+14c98	pop r9        # 73    <98> θ 1
+10e5a	pop xr12, rt  # 48    Mean( <0e> 1
+1d972	pop xr4, rt   #  5    𝐞^( ° 1
+0e5e2	pop xr8, rt   #  6    𝐤 𝐧 0
