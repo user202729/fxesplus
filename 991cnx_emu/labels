@@ -1,0 +1,146 @@
+# Automatically converted from labels file of another model. See label_conv.py.
+# Might be incorrect.
+
+
+
+
+# Library builtins and BL-able addresses (functions).
+# Also contains data labels.
+# Does NOT include gadgets.
+
+# Arguments are 0-indexing.
+# All lines with '#' won't match the Lua pattern so they're effectively
+# comments. Comment for something is put **after** it.
+# Functions with trailing `__` are uncertain.
+
+# ========= Library function
+
+0D354		_strcpy_nn
+2B1EA		_strcat_nn
+2598A		_strlen_f
+0F6DE		_memset_f
+2ACB4		_strcat_fn
+23358		_memcpy_nn
+09C5A		_memmove_nn
+23FE0		_memcpy_fn
+25A3E		_strlen_n
+0C9D4		_strcpy_fn
+0F4E8		_memset_n
+
+# ========= Smart functions (special case NULL)
+
+203C2		smart_strcpy_nn
+203D6		smart_strcat_nn
+# copy to NULL = no-op, copy from NULL = ""
+203B8		smart_strlen_n
+# len(NULL) == 0
+
+# ========= Calculator functions
+
+083D4		line_print.col_0
+# r0: col, r1: row, er2: address
+083D6		line_print
+.l_016		.font_14
+
+221AC		line_print_font14_col0  # r0: row, er2: char*
+
+088B0		render_e3d4
+088BC		render.ddd4
+# copy content at (position) to screen
+09176		memzero
+# at er0, er2 bytes, call memset
+
+1FF30		reset_routine
+
+2AF26		get_string_constant
+# XX INVALID COMMENT XX It appears that only [0xd12b]==0 makes sense
+# XX INVALID COMMENT XX Run `extract-table.py`. Decompiled.
+
+08064		clear_screen
+0835A		str_decompress_print
+
+09328		delay
+
+095EE		_start
+254E4		main
+
+08898		buf1_to_buf2
+# copy between the two screen buffers (1 at 0xDDD4, 2 at 0xE3D4)
+
+269F0		byte_strlen_n # strlen, but returns byte
+
+22040		diagnostic_mode  # display "DIAGNOSTIC / Press AC" text
+2209E		diagnostic
+
+1EB06		diag_scr_888_ws
+221BC		diag_scr_fill_ws  # fill value in r0, then wait for shift
+221CA		diag_scr_ckb1_ws  # 2 checkerboard patterns
+22226		diag_scr_ckb2_ws
+22250		diag_scr_version  # without checksum data
+22278		diag_print_ver
+222D4		diag_checksum
+22382		store_reg_to_stack  # r0..r15 -> [er14-16]
+222AE		diag_print_pd  # called in checksum
+22392		diag_calc_checksum  # always freeze?
+08E60		pd_value
+22492		hex_byte    # r0 -> 2-byte string in er0
+1F6D6		diag_serial_num
+10E58		get_serial_num  # char* output
+22140		diag_check_key
+2279C		diag_contrast
+
+
+1DC6E		diag_waitkey__
+
+084A4		char_print_1byte # r0: col, r1: row, r2: char
+084AE 		char_print       # r0: col, r1: row, er2: char
+.l_18E		.return
+# Print to buffer 2 (may be changed, I don't know)
+# Return value: {char, char*} :
+# number of char printed, end pointer
+
+08690		char_get_14      # er0: char, er2: output adr
+	# the command "inc [ea] ; 094B8" may touches the ROM window
+
+08770		char_get_l14     # er0: char, er2: output adr
+.l_02E		.font_8
+
+09558		zero_KO
+
+0921E		assign_var       # r0: var index, er2: source
+.l_028		.cp_im_part      # cmplx or eqn mode
+
+080B8		buffer_clear
+0FBFE		far_call_stub
+
+09F42		ENTER
+# backup registers, set frame pointer er14
+09F4A		LEAVE
+13CD4		LEAVE3
+2111A		LEAVE4
+# restore registers
+# Usage: 'bl ENTER; ......; b LEAVE;'
+
+# ========= Data labels (also see the cheat table)
+
+d_0D110		modifiers
+d_0D111		mode             # comp cmplx base matrix vector stat dist table
+				# eqn ineq verif ratio = c1 c4 02 06 07 03 0c 88 45 4b 89 4a
+d_0D112		submode
+d_0D11A		num_format       # 8,9,0,4 = fix, sci, norm1, norm2
+d_0D11B		num_format_i     # 0-9
+d_0D11D		angle_unit       # 4,5,6 = deg, rad, grad
+d_0D180		input_range
+
+d_0D318		unstable_char
+d_0D31A		var_m # (???)
+d_0D324		var_ans # (???)
+d_0D32E		var_a # (???)
+# ...
+d_0D374		var_y # (???)
+d_0D37E		var_preans # (???)
+d_0D388		var_z # (???)
+d_0D392		calc_history # (???)
+
+d_0DDD4		screen_buffer
+d_0D137		font_size        # 14 / 10 / 8
