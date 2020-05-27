@@ -95,17 +95,18 @@ for i,x in enumerate(convs):
 
 set_symbolrepr(symbolrepr)
 
-import argparse
+if __name__ == '__main__':
+	import argparse
 
-parser = argparse.ArgumentParser()
-parser.add_argument('-t', '--target', default='overflow',
-		choices=('none', 'overflow', 'loader'),
-		help='how will the output be used')
-parser.add_argument('-f', '--format', default='key',
-		choices=('hex', 'key'),
-		help='output format')
-args = parser.parse_args()
+	parser = argparse.ArgumentParser()
+	parser.add_argument('-t', '--target', default='overflow',
+			choices=('none', 'overflow', 'loader'),
+			help='how will the output be used')
+	parser.add_argument('-f', '--format', default='key',
+			choices=('hex', 'key'),
+			help='output format')
+	args = parser.parse_args()
 
-program = sys.stdin.read().split('\n')
+	program = sys.stdin.read().split('\n')
 
-process_program(args, program, overflow_initial_sp=0x8DA4)
+	process_program(args, program, overflow_initial_sp=0x8DA4)
