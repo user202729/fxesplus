@@ -9,6 +9,7 @@ Currently use `diff` utility to match brief disassembled files.
 However, it appears that different calculator version use different registers.
 '''
 
+import sys
 import re
 import argparse
 from sys import argv,exit,stderr
@@ -25,36 +26,78 @@ parser.add_argument('disn2', nargs='?', default='82espa/_b_disas.txt',
 parser.add_argument('romwin', nargs='?', default=0x8000,
 		type=lambda s:int(s,0),
 		help='size of rom window')
+parser.add_argument('--old-algorithm', action="store_true", help='use old algorithm')
 args = parser.parse_args()
 
 
 def adr(line):return int(line[:6],16)
+def trim(line):return line[28:]
 
 with open(args.disn1,'r') as f: dis1=f.read().splitlines()
 with open(args.disn2,'r') as f: dis2=f.read().splitlines()
 
 codemap=[None]*(adr(dis1[-1])+1)
 
-# note: fail if disn1/disn2 contains single quote
-sedcmd="sed -E 's/.{28}//'"
-for line in run(['bash','-c',
-		f"diff <({sedcmd} '{args.disn1}') <({sedcmd} '{args.disn2}') "
-		"--unchanged-group-format='%df %dl %dF %dL\n' --line-format="
-		],capture_output=True).stdout.splitlines():
-	f1,l1,f2,l2=[int(s)-1 for s in line.split()]
-	assert l1-f1==l2-f2
-	assert dis1[f1][28:]==dis2[f2][28:]
-	nline=l1-f1+1
-	if nline<5:continue
+if args.old_algorithm:
+	# note: fail if disn1/disn2 contains single quote
+	sedcmd="sed -E 's/.{28}//'"
+	for line in run(['bash','-c',
+			f"diff <({sedcmd} '{args.disn1}') <({sedcmd} '{args.disn2}') "
+			"--unchanged-group-format='%df %dl %dF %dL\n' --line-format="
+			],capture_output=True).stdout.splitlines():
+		f1,l1,f2,l2=[int(s)-1 for s in line.split()]
+		assert l1-f1==l2-f2
+		assert dis1[f1][28:]==dis2[f2][28:]
+		nline=l1-f1+1
+		if nline<5:continue
 
-	f1=adr(dis1[f1]);l1=adr(dis1[l1])+1
-	f2=adr(dis2[f2]);l2=adr(dis2[l2])+1
-	# print(f'{f1:05X} .. {l1:05X} -> {f2:05X} .. {l2:05X} : {f2-f1: 5X} | nline = {nline}')
-	codemap[f1:l1]=range(f2,l2)
+		f1=adr(dis1[f1]);l1=adr(dis1[l1])+1
+		f2=adr(dis2[f2]);l2=adr(dis2[l2])+1
+		# print(f'{f1:05X} .. {l1:05X} -> {f2:05X} .. {l2:05X} : {f2-f1: 5X} | nline = {nline}')
+		codemap[f1:l1]=range(f2,l2)
+
+
+else:
+	pos={}
+
+	distrim1=tuple(map(trim, dis1))
+	distrim2=tuple(map(trim, dis2))
+	
+	BLOCK=10
+
+	for i in range(len(distrim2)-BLOCK+1):
+		key=distrim2[i:i+BLOCK]
+		if key in pos:
+			pos[key]=None  #duplicate
+		else:
+			pos[key]=i
+
+	i=0
+	while i+BLOCK<=len(distrim1):
+		key=distrim1[i:i+BLOCK]
+		if key not in pos or pos[key] is None:
+			i+=1
+			continue
+		f2=pos[key]
+		match_len=0
+		try:
+			while distrim1[i+match_len]==distrim2[f2+match_len]:
+				match_len+=1
+		except IndexError: pass
+		assert match_len>=BLOCK
+		match_len-=BLOCK-1  #avoid false match -- but also ignore some valid matches
+
+		f2_=f2
+		f1, l1, f2, l2 = adr(dis1[i]), adr(dis1[i+match_len-1])+1, adr(dis2[f2]), adr(dis2[f2+match_len-1])+1
+		codemap[f1:l1]=range(f2,l2)
+		i+=match_len
+
+
+
+address_to_line2={adr(line): index for index, line in enumerate(dis2)}
 
 datamap=[None]*0x10000
 abs_adr_regex=re.compile(r'.{6} *[^ ]. .. ([^ ][^ ]) ([^ ][^ ])  [^\[]*')
-ix2=0
 for ix1,line in enumerate(dis1):
 	codeadr1=adr(line)
 	if codemap[codeadr1] is None: continue
@@ -62,9 +105,16 @@ for ix1,line in enumerate(dis1):
 	if match and 'BL' not in line and (ix1==0 or 'DSR' not in dis1[ix1-1]):
 		dataadr1=int(match[2]+match[1],16)
 		codeadr2=codemap[adr(line)]
-		while adr(dis2[ix2])!=codeadr2: ix2+=1
-		# print(line)
-		# print(dis2[ix2])
+
+		try:
+			ix2=address_to_line2[codeadr2]
+			assert adr(dis2[ix2])==codeadr2
+			assert trim(line)==trim(dis2[ix2])
+
+		except KeyError:
+			print("Debug: ", line, hex(codeadr2), file=sys.stderr)
+			raise
+
 		match=abs_adr_regex.fullmatch(dis2[ix2])
 		assert match
 		dataadr2=int(match[2]+match[1],16)
