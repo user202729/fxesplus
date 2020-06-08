@@ -1,0 +1,31 @@
+179D2	pop xr0
+1759A	[er2] = r0, r2 = 0
+203C8	smart_strcpy_nn_  # after push lr
+
+20358   pop qr8
+203D2	[er0] = r2
+22052	bl line_print_font14_col0, ..., pop qr0 #might be used to display data twice.
+#2207A	pop qr0
+220FE	print er2 on third line, waitkey, reset_routine  # can only be useful to display data once.
+
+2237E	pop qr0
+22396	calc_checksum_set_f004
+2239E	calc_checksum_no_set_f004  # note: also not set er8
+223A4	calc_checksum_0
+223CC	calc_checksum_2
+22306	pr_checksum
+
+090E2	[er8] += er2, pop xr8
+090E0	r0=0, [er8] += er2, pop xr8
+
+09CC0	mov sp, er14, pop er14, rt
+09CC2	pop er14, rt
+
+
+20D70	mov sp, er14, pop er14
+20D72	pop er14
+
+2237A	mov sp, er14, pop qr8, pop qr0
+2237C	pop qr8, pop qr0
+
+0990E	nop

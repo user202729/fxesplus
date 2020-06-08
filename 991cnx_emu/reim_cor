@@ -1,0 +1,58 @@
+real	behavior
+
+8730	88E8 (diff +1B8) -- 55 94 57 98 94
+
+8F24	90E2 (diff 1be)
+8f48	"1B long"?  (assuming diff=+1b8~ +1be, it's in range 9100~9106)
+		likely 9106, so diff=+1BE
+
+
+8f60	0911E (diff=+1be) -- (01) 10 10 91 21
+
+93C0	955a (diff=19a) 11 92 46 00
+0955a -> 09562 | len=    8 | 11 92 46 f0 1f fe 0f 00
+                                      ----X ----X
+
+C930	4e ?? d0 4e ?? <Chinese> f1 9e <Chinese> e1 00 
+			diff: 2e4
+
+0cc14 -> 0cc25 | len=   11 | 4e f0 50 d0 4e f0 a5 f2 85 f0 01 f1 68 ee 08 e1 00
+                             == ----V ===== ----X ----V ----X ----X       =====
+===: match 1byte, --V: match 2byte, --X: mismatch 2byte.
+
+0df78 -> 0df89 | len=   11 | 4e f0 52 d0 4e f0 a5 f2 85 f0 01 f1 68 ee 08 e1 00
+
+2203E	freeze
+22040	22040-2
+22042	== 22040 (diagnostic mode)
+22052	== 22050 emu ?
+
+
+2207A	freeze
+2207C	complete mismatch -- 888888...
+
+
+220FE	== 22100 (almost certain. Result shows that r0=1 is respected)
+
+222C8	syntax error ("fraction pi 2")
+222D0	syntax error, return normally (")" pi 2)  -- <= emulator 222D2
+222D2	syntax error, return normally (>a+bi pi 2)  -- <= emulator 222D2
+
+(conjecture: "stuff; pop pc" -> returns normally as long as stuff is not very intrusive)
+
+222D6	checksum , syntax error, return normally (cube pi 2)  -- perhaps same as emulator 222D6 --
+			definitely >= emulator 222D4
+222D8	checksum (! pi 2)  -- perhaps same as emulator 222D8
+2237E	checksum function end, ==emulator 2237E
+222E0	freeze
+222E7	shut down
+
+2237E	== 2237E
+
+22740	contrast??? not sure
+
+2279A	same as below
+2279C	"[<][>]:" == 63DE <- f_08E7E <- f_2293E <- many locations :(
+
+27D22	freeze -- might be 28852?
+27D24	"Solar MODEL OK!" -- might be 28854 in emulator? not sure

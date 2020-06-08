@@ -52,7 +52,14 @@
 # XX INVALID COMMENT XX It appears that only [0xd12b]==0 makes sense
 # XX INVALID COMMENT XX Run `extract-table.py`. Decompiled.
 
-08C0C		clear_screen
+08C0C		fill_screen  # (r0: bit pattern, r1: which screen?)
+# r1: bit 0: clear DDD4, bit 1: clear real screen, bit 2: clear E3D4
+.l_03E		.bit_2_on
+.l_022		.bit_0_off
+.l_03A		.bit_1_off
+# legal values: 0-4 (if the value is >=4 then it's as if it's and'd with 3)
+# (compiler bug? if the enum is (0, 1, 2, 4) then the compiler assumes that any value not in (0..4) is undefined behavior)
+
 08F02		str_decompress_print
 
 09F3A		delay
@@ -67,6 +74,21 @@
 2AB26		byte_strlen_n # strlen, but returns byte
 
 23C4C		diagnostic_mode  # display "DIAGNOSTIC / Press AC" text
+.l_036		.return_not_3
+.l_040		.return_not_2
+.l_044		.end
+
+
+0ACB6		f_0ACB6
+.l_0DC		diagnostic_wait_key  # char -> r0
+.l_110		.zero_KO_return_r6
+.l_222		.return_r6
+.l_0F2		.keep_waiting_key
+
+
+
+0E826		check_any_key_pressed__ # returns char or bool
+
 23CB4		diagnostic
 
 ?????		diag_scr_888_ws
@@ -141,5 +163,6 @@ d_0D37E		var_preans # (???)
 d_0D388		var_z # (???)
 d_0D392		calc_history # (???)
 
+d_0D139     current_screen_buffer # ==0 -> 0xE3D4, !=0 -> 0xDDD4. Affects many drawing functions
 d_0DDD4		screen_buffer
 d_0D137		font_size        # 14 / 10 / 8

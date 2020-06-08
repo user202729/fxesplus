@@ -1,0 +1,23 @@
+# (gadgets used in the read rom checksum segment 2 method are likely to be correct)
+
+203C8	smart_strcpy_nn_  # after push lr
+# ^ hard (03)
+#20358   pop qr8  # **very hard**
+
+# 0D is quite expensive
+20D70	mov sp, er14, pop er14
+20D72	pop er14
+20D74	nop2
+
+# part of the checksum function
+# NOTE: both hard
+223CC	calc_checksum_2
+22306	pr_checksum
+
+2237A	mov sp, er14, pop qr8, pop qr0
+2237C	pop qr8, pop qr0
+2237E	pop qr0
+22380	nop  #very hard
+
+8f24	[er8] += er2, pop xr8 # very hard
+8f22	r0=0, [er8] += er2, pop xr8 # slightly easier
