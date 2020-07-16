@@ -28,9 +28,9 @@ y:
 	adr_of [-0x2da] start_value # er8: dif between cache and undo
 	0x30303030 # r10~13, unused
 	adr_of [-2] home # er14
-	0x38373635 #r4~ 7
+	0x3231 #er0, unused
 	0x3432 #er2 (must be ==2 mod 4)
-	0x3130 #er0, unused
+	0x38373635 #r4~ 7
 
 	call r0=0, [er8] += er2, pop xr8 # only modify er2, lr and er14 unchanged
 
