@@ -1,0 +1,158 @@
+# Automatically converted from labels file of another model. See label_conv.py.
+# Might be incorrect.
+
+
+
+
+# Library builtins and BL-able addresses (functions).
+# Also contains data labels.
+# Does NOT include gadgets.
+
+# Arguments are 0-indexing.
+# All lines with '#' won't match the Lua pattern so they're effectively
+# comments. Comment for something is put **after** it.
+# Functions with trailing `__` are uncertain.
+
+# ========= Library function
+
+0D070		_strcpy_nn
+2A020		_strcat_nn
+22DC4		_memcpy_nn
+09A3A		_memmove_nn
+2536A		_strlen_n
+0F1A8		_memset_n
+
+# ========= Smart functions (special case NULL)
+
+203C2		smart_strcpy_nn
+203D6		smart_strcat_nn
+# copy to NULL = no-op, copy from NULL = ""
+203B8		smart_strlen_n
+# len(NULL) == 0
+
+# ========= Calculator functions
+
+0821C		line_print.col_0
+# r0: col, r1: row, er2: address
+0821E		line_print
+.l_016		.font_14
+
+221AC		line_print_font14_col0  # r0: row, er2: char*
+
+086F8		render_e3d4
+08704		render.ddd4
+# copy content at (position) to screen
+08FB8		memzero
+# at er0, er2 bytes, call memset
+
+1F99C		reset_routine
+
+29D5C		get_string_constant
+# XX INVALID COMMENT XX It appears that only [0xd12b]==0 makes sense
+# XX INVALID COMMENT XX Run `extract-table.py`. Decompiled.
+
+07EAC		fill_screen  # (r0: bit pattern, r1: which screen?)
+# r1: bit 0: clear DDD4, bit 1: clear real screen, bit 2: clear E3D4
+.l_03E		.bit_2_on
+.l_022		.bit_0_off
+.l_03A		.bit_1_off
+# legal values: 0-4 (if the value is >=4 then it's as if it's and'd with 3)
+# (compiler bug? if the enum is (0, 1, 2, 4) then the compiler assumes that any value not in (0..4) is undefined behavior)
+
+081A2		str_decompress_print
+
+0916A		delay
+
+093FE		_start
+24E36		main
+
+086E0		buf1_to_buf2
+# copy between the two screen buffers (1 at 0xDDD4, 2 at 0xE3D4)
+
+26226		byte_strlen_n # strlen, but returns byte
+
+22040		diagnostic_mode  # display "DIAGNOSTIC / Press AC" text
+.l_03A		.return_0_ac_or_timeout
+.l_036		.return_1_diagnostic
+2209E		diagnostic
+
+1E680		diag_scr_888_ws
+221BC		diag_scr_fill_ws  # fill value in r0, then wait for shift
+221CA		diag_scr_ckb1_ws  # 2 checkerboard patterns
+22226		diag_scr_ckb2_ws
+22250		diag_scr_version  # without checksum data
+22278		diag_print_ver
+222D4		diag_checksum
+22382		store_reg_to_stack  # r0..r15 -> [er14-16]
+222AE		diag_print_pd  # called in checksum
+22392		diag_calc_checksum  # always freeze?
+08CA8       pd_value
+22492		hex_byte    # r0 -> 2-byte string in er0
+1F1D6		diag_serial_num
+10E58		get_serial_num  # char* output
+22140		diag_check_key
+1FCBE		diag_contrast  # (use_english: bool @r0)
+.l_034		language_chinese
+
+27BC8		diag_8_keytest
+
+
+2A048		line_print__call__
+08BF4		str_decompress_print__call__
+08C4A		str_decompress_print__call1__
+
+
+
+082EC		char_print_1byte # r0: col, r1: row, r2: char
+082F6 		char_print       # r0: col, r1: row, er2: char
+.l_18E		.return
+# Print to buffer 2 (may be changed, I don't know)
+# Return value: {char, char*} :
+# number of char printed, end pointer
+
+084D8		char_get_14      # er0: char, er2: output adr
+	# the command "inc [ea] ; 094B8" may touches the ROM window
+
+085B8		char_get_l14     # er0: char, er2: output adr
+.l_02E		.font_8
+
+0939A		zero_KO
+
+09060		assign_var       # r0: var index, er2: source
+.l_028		.cp_im_part      # cmplx or eqn mode
+
+07F00		buffer_clear
+0FBFE		far_call_stub
+
+09D22		ENTER
+# backup registers, set frame pointer er14
+09D2A		LEAVE
+13CD0		LEAVE3
+2111A		LEAVE4
+# restore registers
+# Usage: 'bl ENTER; ......; b LEAVE;'
+
+# ========= Data labels (also see the cheat table)
+
+d_0D110		modifiers
+d_0D111		mode             # comp cmplx base matrix vector stat dist table
+				# eqn ineq verif ratio = c1 c4 02 06 07 03 0c 88 45 4b 89 4a
+d_0D112		submode
+d_0D11A		num_format       # 8,9,0,4 = fix, sci, norm1, norm2
+d_0D11B		num_format_i     # 0-9
+d_0D11D		angle_unit       # 4,5,6 = deg, rad, grad
+d_0D180		input_range
+
+d_0D318		unstable_char # (???)
+d_0D31A		var_m # (???) # (???)
+d_0D324		var_ans # (???) # (???)
+d_0D32E		var_a # (???) # (???)
+# ...
+d_0D374		var_y # (???) # (???)
+d_0D37E		var_preans # (???) # (???)
+d_0D388		var_z # (???) # (???)
+d_0D392		calc_history # (???) # (???)
+
+d_0D139     current_screen_buffer # ==0 -> 0xE3D4, !=0 -> 0xDDD4. Affects many drawing functions
+d_0DDD4		screen_buffer
+d_0D137		font_size        # 14 / 10 / 8

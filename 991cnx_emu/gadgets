@@ -14,6 +14,7 @@
 223A4	calc_checksum_0
 223CC	calc_checksum_2
 22306	pr_checksum
+2233E	pr_checksum_2
 
 090E2	[er8] += er2, pop xr8
 090E0	r0=0, [er8] += er2, pop xr8
@@ -28,4 +29,4 @@
 2237A	mov sp, er14, pop qr8, pop qr0
 2237C	pop qr8, pop qr0
 
-0990E	nop
+222AC	nop
