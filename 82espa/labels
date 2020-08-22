@@ -35,7 +35,9 @@
 14C14		hex_byte    # r0 -> 2-byte string in er0
 04106		strcpy
 0748C		memset
+074C4		__uimulu8   # xr0 = er0 * er2
 074EE		memcpy
+0812C		__uidivu8	# er0 = er0 / er2, er2 = er0 Mod er2
 081AE		strlen
 081CC		strchr
 08C10		far_call_stub  # it's likely that the compiler auto generate
@@ -532,5 +534,5 @@ d_087D8 	screen_buffer.8
 d_087D9 	screen_buffer.9
 d_087DA 	screen_buffer.A
 d_087DB 	screen_buffer.B
-d_08DEA # (???)
+d_08DEA     # initial sp value
 
