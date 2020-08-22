@@ -50,6 +50,8 @@
 08C12		strcat
 0A4E2		table_home  # go to row 1 col 1 of table
 0A598		reset_all
+0A63E       clear_input_area
+0A64A       clear_calc_cache
 0A6C2		getscancode  # void (keyinfo* er0)
 				# where keyinfo = struct { char ki; char ko; }
 
@@ -61,7 +63,7 @@
 0AA78		getkeycode  # handle modifier keys
 				# (for example shift+1 has different keycode from 1)
 
-0AC20       f_0AC20 # return 1 if [=] is pressed, return 0 if other key is pressed, ignore key F0
+0AC20       f_0AC20 # return 1 if line_equalily(SHIFT + [=] in MthIO or simply [=] in LineIO) is pressed, return 0 if other key is pressed, ignore key Math_equlity([=] in MthIO).
 0AC40       wait_shift
 0AECE		f_0AECE  # void(byte) : param is a bitmask
 				# bit 7: keep formula (if turned off, formula at 8154 is reset)
@@ -541,5 +543,5 @@ d_087D8 	screen_buffer.8
 d_087D9 	screen_buffer.9
 d_087DA 	screen_buffer.A
 d_087DB 	screen_buffer.B
-d_08DEA     # initial sp value
+d_08DF2     # initial sp value
 
