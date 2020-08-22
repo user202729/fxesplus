@@ -20,6 +20,8 @@
 0313A		draw_byte        # take a pointer to a byte on the screen, the bitmask
 				# to draw and the background bitmask. Using draw_mode.
 031A8		render           # copy screen buffer -> screen
+0320E       draw_status_bar  # draw the status bar to the screen buffer according to the calculator settings
+                # use_buffer is not supported.
 034B8		print_4lines
 034F6		set_up_arrow
 034FC		set_down_arrow
@@ -31,67 +33,73 @@
 .l_042		.no
 03BE4		shutdown
 03C36		delay       # 04640
-?????		diagnostic_mode
-14C14		hex_byte    # r0 -> 2-byte string in er0
+
 04106		strcpy
 0748C		memset
 074C4		__uimulu8   # xr0 = er0 * er2
 074EE		memcpy
+
+080E8		f_080E8  # bool(void): mode == table && [80fc] == 1
+
 0812C		__uidivu8	# er0 = er0 / er2, er2 = er0 Mod er2
 081AE		strlen
 081CC		strchr
+08634       set_contrast  # bool r0: diagnostic mode?
 08C10		far_call_stub  # it's likely that the compiler auto generate
 				# this to call far function pointer
 08C12		strcat
 0A4E2		table_home  # go to row 1 col 1 of table
 0A598		reset_all
-0A6C2		keypress_wait__
+0A6C2		getscancode  # void (keyinfo* er0)
+				# where keyinfo = struct { char ki; char ko; }
+
 0A98A		char_print_real_screen__  # char(*er0) -> real screen at (*er2)
-0AA78		getkeycode
 
-080E8		f_08ADC  # bool(void): mode == table && [80fc] == 1
+0AA2A   `   scancode_to_int  # int (keyinfo const* er0, char* lookuptable)
+				# usually this function is used after getscancode
 
-0AECE		f_0B8B8  # void(byte) : param is a bitmask
+0AA78		getkeycode  # handle modifier keys
+				# (for example shift+1 has different keycode from 1)
+
+0AC20       f_0AC20 # return 1 if [=] is pressed, return 0 if other key is pressed, ignore key F0
+0AC40       wait_shift
+0AECE		f_0AECE  # void(byte) : param is a bitmask
 				# bit 7: keep formula (if turned off, formula at 8154 is reset)
 				# bit 0~3:
 				#   * clear screen (if all 0, not clear screen buffer)
 				#   * if !=2, not call f_0B998 (print prev result?)
 				# f_0A564: if return != 0: enter small text at bottom of screen
-0AFAE		f_0B998  # void(???)
+0AFAE		f_0AFAE  # void(???)
 				# print output '0', unless f_08ADC or f_087BA
+10668		table_prompt_print    # (byte row)
+14882		diagnostic_mode  # display "DIAGNOSTIC / Press AC" text
+148D6		diagnostic
+14966		diag_check_key
+149D2		line_print_small  # r0: row
+149E2		diag_scr_fill_ws  # fill value in r0, then wait for shift
+14A10		diag_scr_ckb1_ws  # 2 checkerboard patterns
+14A30		diag_scr_ckb2_ws
+14A38		diag_scr_box_ws
+14A7E		diag_checksum
+14C14		hex_byte    # r0 -> 2-byte string in er0
+14C7E		render_waitshift
 1A282		invalid_var
 
-10668		table_prompt_print    # (byte row)
 
 # ======== Functions that manipulate calculator-level numbers
 # ======== Variable branch at 150BA, jumptable at 1AE6
 
-?????
-?????
-?????
-?????		mat_det
-?????
 12CD4
-?????
 13038
 1303C
-?????		mat_add
-?????		mat_sub
-?????		mat_mul_num
-?????		mat_div
-?????
-?????
-?????		mat_mul
 13058
 1277A		num_stat_P
 1281A		num_stat_Q
 12834		num_stat_R
 1305C
 13086
-?????
 
 # unary functions (decimal index 23..28, see code at 150A0)
-?????
 193F0		num_abs
 130FE		num_rnd
 13054
@@ -191,7 +199,6 @@
 19784		num_add_1
 197AC		num_mul_1
 19798		num_div_1
-?????		cmplx_square_1  # have er2 == er0 when calling
 
 18C02		l_regs          # Load register from argument
 18C0A		l_reg0
