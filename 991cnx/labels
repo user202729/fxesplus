@@ -132,15 +132,25 @@
 # restore registers
 # Usage: 'bl ENTER; ......; b LEAVE;'
 
+# jumptable at 0076E
+2A608
+253AC
+2A01C
+2621C
+
 # ========= Data labels (also see the cheat table)
 
 d_0D110		modifiers
 d_0D111		mode             # comp cmplx base matrix vector stat dist table
 				# eqn ineq verif ratio = c1 c4 02 06 07 03 0c 88 45 4b 89 4a
 d_0D112		submode
+d_0D113		cur_scr       # Current Screen
+d_0D114		input_mode  # normal1, stat/table12, matrix13, vector14, eqn15, ratio17, ineq18
 d_0D11A		num_format       # 8,9,0,4 = fix, sci, norm1, norm2
 d_0D11B		num_format_i     # 0-9
 d_0D11D		angle_unit       # 4,5,6 = deg, rad, grad
+d_0D11E		isMathI
+d_0D11F		frac_result
 d_0D180		input_range
 
 d_0D318		unstable_char # (???)

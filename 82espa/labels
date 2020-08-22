@@ -32,7 +32,7 @@
 03BE4		shutdown
 03C36		delay       # 04640
 ?????		diagnostic_mode
-?????		hex_byte    # r0 -> 2-byte string in er0
+14C14		hex_byte    # r0 -> 2-byte string in er0
 04106		strcpy
 0748C		memset
 074EE		memcpy

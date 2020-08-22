@@ -45,6 +45,7 @@ Allowed tags:
 0331E		no-op
 #?????		pop er12
 #?????		r2 = r0
+039EA		[er8] = er2, pop xr8
 039E6		[er8] += er2, pop xr8
 03A08		{RT} [er10] = er8, pop qr8
 03AA2		pop er2
@@ -52,6 +53,7 @@ Allowed tags:
 03D18		{Set LR} KO = R2 = 0             # expensive
 0421E		sp = er14, pop er14
 04220		pop er14
+04952		r0 = r1
 06A40		er2 = er0, pop er8
 06A42		er0 = er2, pop er8
 06A44		pop er8
