@@ -36,16 +36,16 @@ Allowed tags:
 
 0278A		{Set LR} {Override rename list} strcpy_null
 02798		[ER0] = R2
-02824       pop xr12
+02824		pop xr12
 02ADC		{RT} r0 >>= 4
 02D1C		r0 = r8, pop r8
 02DB0		pop er4
-03136       {RT} er0 = er2
+03136		{RT} er0 = er2
 031FE		{RT} R0 = R2, pop xr8
-03318       memcpy, pop er0
+03318		memcpy, pop er0
 0331C		pop er0
 039E6		[er8] += er2, pop xr8
-039EA       [er8] = er2, pop xr8
+039EA		[er8] = er2, pop xr8
 03A08		{RT} [er10] = er8, pop qr8
 03AA2		pop er2
 03D18		{Set LR} KO = R2 = 0             # expensive
@@ -65,9 +65,9 @@ Allowed tags:
 12CC0		r0 = [er2]
 12E1A		r0 = 0, pop er14 r4
 12F4E		er8 = er0
-13034       pop xr0
-136B0       pop xr4
-13E4E       pop qr0
+13034		pop xr0
+136B0		pop xr4
+13E4E		pop qr0
 1413A		r2 = r4
 15692		r0 = r8, pop xr8
 15696		pop xr8

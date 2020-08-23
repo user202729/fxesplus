@@ -20,7 +20,7 @@
 0313A		draw_byte        # take a pointer to a byte on the screen, the bitmask
 				# to draw and the background bitmask. Using draw_mode.
 031A8		render           # copy screen buffer -> screen
-0320E       draw_status_bar  # draw the status bar to the screen buffer according to the calculator settings
+0320E		draw_status_bar  # draw the status bar to the screen buffer according to the calculator settings
                 # use_buffer is not supported.
 034B8		print_4lines
 034F6		set_up_arrow
@@ -44,27 +44,27 @@
 0812C		__uidivu8	# er0 = er0 / er2, er2 = er0 Mod er2
 081AE		strlen
 081CC		strchr
-08634       set_contrast  # bool r0: diagnostic mode?
+08634		set_contrast  # bool r0: diagnostic mode?
 08C10		far_call_stub  # it's likely that the compiler auto generate
 				# this to call far function pointer
 08C12		strcat
 0A4E2		table_home  # go to row 1 col 1 of table
 0A598		reset_all
-0A63E       clear_input_area
-0A64A       clear_calc_cache
+0A63E		clear_input_area
+0A64A		clear_calc_cache
 0A6C2		getscancode  # void (keyinfo* er0)
 				# where keyinfo = struct { char ki; char ko; }
 
 0A98A		char_print_real_screen__  # char(*er0) -> real screen at (*er2)
 
-0AA2A   `   scancode_to_int  # int (keyinfo const* er0, char* lookuptable)
+0AA2A		scancode_to_int  # int (keyinfo const* er0, char* lookuptable)
 				# usually this function is used after getscancode
 
 0AA78		getkeycode  # handle modifier keys
 				# (for example shift+1 has different keycode from 1)
 
-0AC20       f_0AC20 # return 1 if line_equalily(SHIFT + [=] in MthIO or simply [=] in LineIO) is pressed, return 0 if other key is pressed, ignore key Math_equlity([=] in MthIO).
-0AC40       wait_shift
+0AC20		f_0AC20 # return 1 if line_equalily(SHIFT + [=] in MthIO or simply [=] in LineIO) is pressed, return 0 if other key is pressed, ignore key Math_equlity([=] in MthIO).
+0AC40		wait_shift
 0AECE		f_0AECE  # void(byte) : param is a bitmask
 				# bit 7: keep formula (if turned off, formula at 8154 is reset)
 				# bit 0~3:
@@ -543,5 +543,5 @@ d_087D8 	screen_buffer.8
 d_087D9 	screen_buffer.9
 d_087DA 	screen_buffer.A
 d_087DB 	screen_buffer.B
-d_08DF2     # initial sp value
+d_08DF2		# initial sp value
 
