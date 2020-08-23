@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 cd "$(dirname $0)/.."
 if [ ! -f CasioEmu/models/fx991cnx/rom.bin ]; then
 	cp -l 991cnx/rom.bin CasioEmu/models/fx991cnx/rom.bin

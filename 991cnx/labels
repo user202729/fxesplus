@@ -86,7 +86,7 @@
 22382		store_reg_to_stack  # r0..r15 -> [er14-16]
 222AE		diag_print_pd  # called in checksum
 22392		diag_calc_checksum  # always freeze?
-08CA8       pd_value
+08CA8		pd_value
 22492		hex_byte    # r0 -> 2-byte string in er0
 1F1D6		diag_serial_num
 10E58		get_serial_num  # char* output
@@ -132,15 +132,25 @@
 # restore registers
 # Usage: 'bl ENTER; ......; b LEAVE;'
 
+# jumptable at 0076E
+2A608
+253AC
+2A01C
+2621C
+
 # ========= Data labels (also see the cheat table)
 
 d_0D110		modifiers
 d_0D111		mode             # comp cmplx base matrix vector stat dist table
 				# eqn ineq verif ratio = c1 c4 02 06 07 03 0c 88 45 4b 89 4a
 d_0D112		submode
+d_0D113		cur_scr       # Current Screen
+d_0D114		input_mode  # normal1, stat/table12, matrix13, vector14, eqn15, ratio17, ineq18
 d_0D11A		num_format       # 8,9,0,4 = fix, sci, norm1, norm2
 d_0D11B		num_format_i     # 0-9
 d_0D11D		angle_unit       # 4,5,6 = deg, rad, grad
+d_0D11E		isMathI
+d_0D11F		frac_result
 d_0D180		input_range
 
 d_0D318		unstable_char # (???)
@@ -153,6 +163,6 @@ d_0D37E		var_preans # (???) # (???)
 d_0D388		var_z # (???) # (???)
 d_0D392		calc_history # (???) # (???)
 
-d_0D139     current_screen_buffer # ==0 -> 0xE3D4, !=0 -> 0xDDD4. Affects many drawing functions
+d_0D139		current_screen_buffer # ==0 -> 0xE3D4, !=0 -> 0xDDD4. Affects many drawing functions
 d_0DDD4		screen_buffer
 d_0D137		font_size        # 14 / 10 / 8
