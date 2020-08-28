@@ -6,6 +6,26 @@
 # Functions with trailing `__` are uncertain.
 # ========
 
+# Library functions.
+
+
+0812C		cidimou8 # er0 = er0 / er2, er2 = er0 Mod er2
+081A0		__idivu8
+03EFC		__imodu8
+074C4		__imulu8 # xr0 = er0 * er2
+0816C		sidimou8
+08120		__uidivu8
+
+074EE		memcpy
+03E8E		memmove
+0748C		memset
+08C12		strcat
+081CC		strchr
+04106		strcpy
+081AE		strlen
+
+
+
 0277E		strlen_null      # strlen, but treat NULL as ""
 02788		strcpy_null
 0279C		strcat_null      # delete target if try to cat NULL
@@ -34,20 +54,11 @@
 03BE4		shutdown
 03C36		delay       # 04640
 
-04106		strcpy
-0748C		memset
-074C4		__uimulu8   # xr0 = er0 * er2
-074EE		memcpy
-
 080E8		f_080E8  # bool(void): mode == table && [80fc] == 1
 
-0812C		__uidivu8	# er0 = er0 / er2, er2 = er0 Mod er2
-081AE		strlen
-081CC		strchr
 08634		set_contrast  # bool r0: diagnostic mode?
 08C10		far_call_stub  # it's likely that the compiler auto generate
 				# this to call far function pointer
-08C12		strcat
 0A4E2		table_home  # go to row 1 col 1 of table
 0A598		reset_all
 0A63E		clear_input_area

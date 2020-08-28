@@ -83,6 +83,3 @@ Allowed tags:
 031B2		{RT} Render, pop er0 qr8 xr4     # *(stack-front) -> real screen
 034BD		multiline ASCII                  # at ER0, R2 lines
 0369C		{Set LR} Render buffer
-
-03E8E		{RT} memmove                     # similar to memcpy
-				# er0 <- er2. Call 4e50. Do nothing if er2 == 0.
