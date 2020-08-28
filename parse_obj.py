@@ -127,7 +127,9 @@ def parse_data(data, print = print, parse_0x08 = False):
 			else: assert False, block.xxd()
 			print(f'Memory model: {mem_model_str}')
 
-			assert block.read(2) == b'\x03\x01', block.xxd()
+			unknown_1 = block.read(2)
+			assert unknown_1 in (b'\x03\x01', b'\x03\x02'), block.xxd()
+			# normally the first one, but could be the second one in e.g. ulmodlw
 			block.skip_zero(1)
 			block.read(3)
 			block.skip_zero(2)
@@ -139,7 +141,9 @@ def parse_data(data, print = print, parse_0x08 = False):
 
 		elif block_type == 0x20:
 			assert asm_name == block.read_str()
-			assert block.read(1) == b'\x02', block.xxd()
+			unknown_1 = block.read(1)[0]
+			assert unknown_1 in (0, 2), block.xxd()
+			# normally 2, but might be 0 for e.g. ulmodsw
 			block.skip_zero(4)
 
 		elif block_type == 0xe:

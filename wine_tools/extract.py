@@ -5,19 +5,19 @@
 # (with or without '.lib' are both ok)
 
 CMD = 'wine cmd'
-# LIB file. Should be placed in the current directory.
-lib_name = 'LU8100LW'
 
 import re
 import os
 import sys
 
+# LIB file. Should be placed in the current directory.
+lib_name = 'LU8100LW'
 if len(sys.argv) == 2:
 	lib_name = sys.argv[1]
 	if lib_name.lower().endswith('.lib'):
 		lib_name = lib_name[:-4]
 
-os.system(f'{CMD} /c "init && LibU8 {lib_name};"') # extract LST file
+os.system(f'{CMD} /c "init && LibU8 {lib_name};" >/dev/null') # extract LST file
 os.system(f'{CMD} /c "rd /s /q obj & mkdir obj"')
 
 with open(f'{lib_name}.lst', 'r') as lst_file:
@@ -58,5 +58,5 @@ for _ in range(module_cnt):
 assert all(not x for x in lst)
 
 os.system(f'{CMD} /c "init && \
-	LibU8 {lib_name} '+' '.join('*obj\\'+x for x in modules)+';"')
+	LibU8 {lib_name} '+' '.join('*obj\\'+x for x in modules)+';" >/dev/null')
 

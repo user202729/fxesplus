@@ -1,26 +1,46 @@
 #!/usr/bin/python3
-FOLDER_PATH = 'obj/'
-ROM_PATH = '../rom.bin'
+"""
+Parses all .obj files in args.folder_path, match the function code against args.rom_path.
+Prints all data, plus some debugging functions.
+Grep for `Fn` for the found matchings.
+"""
+
+import argparse
+
+parser = argparse.ArgumentParser()
+parser.add_argument('-f', '--folder-path', default='obj/',
+		help='path to the folder containing .obj files')
+parser.add_argument('-r', '--rom-path', default='../rom.bin',
+		help='path to the rom to match against')
+parser.add_argument('-v', '--verbose', action='store_true',
+		help='path to the rom to match against')
+args = parser.parse_args()
 
 import sys
 sys.path.append('..')
 from parse_obj import parse_data
 import os
 
-with open(ROM_PATH, 'rb') as rom_file:
+with open(args.rom_path, 'rb') as rom_file:
 	rom = rom_file.read()
 
 a = set()
 
-for file in os.listdir(os.fsencode(FOLDER_PATH)):
-	filename = os.fsdecode(file)
-	with open(FOLDER_PATH + filename, 'rb') as obj_file:
-		data = parse_data(obj_file.read(), print = lambda x:0)
+for filename in os.listdir(os.fsencode(args.folder_path)):
+	filename = os.fsdecode(filename)
+	with open(args.folder_path + filename, 'rb') as obj_file:
+		data = parse_data(obj_file.read(), print = print if args.verbose else lambda *args, **kwargs: None)
 	for obj_id, obj_name in data['nameof_export'].items():
 		if 'fn' not in data['typeof_export'][obj_id]:
 			continue
 		fn_code = data["obj_data"][obj_id]
 		fn_len = len(fn_code)
+
+		if args.verbose:
+			import xxd
+			print("="*20, obj_name)
+			xxd.xxd(fn_code)
+			print("="*20)
 
 		matches = []
 		for i in range(0, len(rom)-fn_len, 2):
