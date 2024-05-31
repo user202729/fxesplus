@@ -1,4 +1,4 @@
-import lib_570esp
+import libcompiler
 
 from collections import defaultdict
 
@@ -12,12 +12,12 @@ def get_npress(it):
 	ans = 0
 	for i in it:
 		if it in alts: ans += 1
-		else: ans += lib_570esp.get_npress(i)
+		else: ans += libcompiler.get_npress(i)
 	return ans
 
 def to_key(i):
 	if i in alts: return alts[i]
-	return lib_570esp.to_key(i)
+	return libcompiler.byte_to_key(i)
 
 def generate_pairs():
 	it = defaultdict(lambda: (float('inf'),))

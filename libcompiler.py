@@ -506,7 +506,7 @@ def process_program(args, program, overflow_initial_sp):
 			))
 	elif args.target == 'loader' and args.format == 'key':
 		# NOTE: loader target may be specific to 570es+/991es+
-		print('%s %s:'%(byte_to_key((home - home2) & 255), byte_to_key((home - home2) >> 8)))
+		print('Address to load: %s %s'%(byte_to_key((home - home2) & 255), byte_to_key((home - home2) >> 8)))
 		for i in range(home2):
 			result.insert(0, 0)
 		import keypairs
