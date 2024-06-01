@@ -123,7 +123,7 @@ def get_commands(filename):
 		A dict 
 	'''
 	global commands
-	with open(filename, 'r') as f:
+	with open(filename, 'r', encoding='u8') as f:
 		data = f.read().splitlines()
 
 	in_comment = False
@@ -173,7 +173,7 @@ def get_disassembly(filename):
 		mov r2, 1                      ; 0A0A2 | 0201
 	'''
 	global disasm
-	with open(filename, 'r') as f:
+	with open(filename, 'r', encoding='u8') as f:
 		data = f.read().splitlines()
 
 	line_regex = re.compile(r'\t(.*?)\s*; ([0-9a-fA-F]*) \|')
@@ -191,7 +191,7 @@ def read_rename_list(filename):
 	If the rename list is ambiguous without disassembly, it raises an error.
 	'''
 	global commands, datalabels
-	with open(filename, 'r') as f:
+	with open(filename, 'r', encoding='u8') as f:
 		data = f.read().splitlines()
 
 	line_regex   = re.compile(r'^\s*([\w_.]+)\s+([\w_.]+)')
