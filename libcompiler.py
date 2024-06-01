@@ -127,7 +127,7 @@ def get_commands(filename):
 		data = f.read().splitlines()
 
 	in_comment = False
-	line_regex = re.compile('([0-9a-fA-F]+)\s+(.+)')
+	line_regex = re.compile(r'([0-9a-fA-F]+)\s+(.+)')
 	for line_index0, line in enumerate(data):
 		line = line.strip()
 
